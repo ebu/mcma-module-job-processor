@@ -17,6 +17,11 @@ variable "log_group_name" {
   description = "Log group name used by MCMA Event tracking"
 }
 
+variable "dashboard_name" {
+  type        = string
+  description = "Name for AWS CloudWatch dashboard"
+}
+
 variable "dead_letter_config_target" {
   type        = string
   description = "Configuring dead letter target for worker lambda"

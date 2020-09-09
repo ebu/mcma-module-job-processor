@@ -35,8 +35,9 @@ module "job_processor_aws" {
   module_prefix    = "${var.global_prefix}-job-processor"
   stage_name       = var.environment_type
   service_registry = module.service_registry_aws
+  dashboard_name   = var.global_prefix
 
   api_gateway_logging_enabled = true
   api_gateway_metrics_enabled = true
-  xray_tracing_enabled = true
+  xray_tracing_enabled        = true
 }
