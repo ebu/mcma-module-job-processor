@@ -1,0 +1,10 @@
+include "aws",
+        "aws:api-handler",
+        "aws:lib-common",
+        "aws:periodic-job-checker",
+        "aws:periodic-job-cleanup",
+        "aws:worker",
+        "deployment",
+        "scripts",
+        "scripts:post-deploy",
+        "scripts:publish"
