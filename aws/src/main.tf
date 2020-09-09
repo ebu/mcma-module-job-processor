@@ -468,8 +468,11 @@ resource "aws_api_gateway_stage" "service_gateway_stage" {
   xray_tracing_enabled = var.xray_tracing_enabled
 
   variables = {
-    "TableName" = aws_dynamodb_table.service_table.name
-    "PublicUrl" = local.service_url
+    TableName        = aws_dynamodb_table.service_table.name
+    PublicUrl        = local.service_url
+    ServicesUrl      = var.service_registry.services_url
+    ServicesAuthType = var.service_registry.auth_type
+    WorkerFunctionId = aws_lambda_function.worker.function_name
   }
 
   tags = var.tags
