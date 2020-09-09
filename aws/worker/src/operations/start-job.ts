@@ -7,6 +7,8 @@ import { DataController } from "@local/job-processor";
 
 import { logJobEvent } from "../utils";
 
+const { CloudWatchEventRule } = process.env;
+
 const cloudWatchEvents = new CloudWatchEvents();
 
 export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {
@@ -49,24 +51,6 @@ export async function startExecution(job: Job, dataController: DataController, r
     job.progress = undefined;
     job = await dataController.updateJob(job);
 
-    async function failJob(error: Error) {
-        jobExecution.status = JobStatus.Failed;
-        jobExecution.error = new ProblemDetail({
-            type: "uri://mcma.ebu.ch/rfc7807/job-processor/job-start-failure",
-            title: "Failed to start job",
-            detail: error?.message,
-            stacktrace: error?.toString(),
-        });
-        await dataController.updateExecution(jobExecution);
-
-        logger.error("Failed to start job due to error '" + error?.message + "'");
-        logger.error(error?.toString());
-        job.status = jobExecution.status;
-        job.error = jobExecution.error;
-
-        return await dataController.updateJob(job);
-    }
-
     try {
         logger.info("Creating Job Assignment");
 
@@ -76,17 +60,17 @@ export async function startExecution(job: Job, dataController: DataController, r
         // validating job.jobInput with required input parameters of jobProfile
         const jobInput = job.jobInput;
         if (!jobInput) {
-            return await failJob(new McmaException("Job is missing jobInput"));
+            throw new McmaException("Job is missing jobInput");
         }
 
         if (jobProfile.inputParameters) {
             if (!Array.isArray(jobProfile.inputParameters)) {
-                return await failJob(new McmaException("JobProfile.inputParameters is not an array"));
+                throw new McmaException("JobProfile.inputParameters is not an array");
             }
 
             for (const parameter of jobProfile.inputParameters) {
                 if (jobInput[parameter.parameterName] === undefined) {
-                    return await failJob(new McmaException("jobInput misses required input parameter '" + parameter.parameterName + "'"));
+                    throw new McmaException("jobInput misses required input parameter '" + parameter.parameterName + "'");
                 }
             }
         }
@@ -129,8 +113,8 @@ export async function startExecution(job: Job, dataController: DataController, r
             }
         }
 
-        if (!jobAssignmentResourceEndpoint) {
-            return await failJob(new McmaException("Failed to find service that could execute the " + job["@type"] + " with Job Profile '" + jobProfile.name + "'"));
+        if (!selectedService || !jobAssignmentResourceEndpoint) {
+            throw new McmaException("Failed to find service that could execute the " + job["@type"] + " with Job Profile '" + jobProfile.name + "'");
         }
 
         let jobAssignment = new JobAssignment({
@@ -155,7 +139,7 @@ export async function startExecution(job: Job, dataController: DataController, r
                 // Something happened in setting up the request that triggered an Error
                 logger.error(error.message);
             }
-            return await failJob(new McmaException("Failed to post JobAssignment to Service '" + selectedService.name + "' at endpoint: " + jobAssignmentResourceEndpoint.httpEndpoint));
+            throw new McmaException("Failed to post JobAssignment to Service '" + selectedService.name + "' at endpoint: " + jobAssignmentResourceEndpoint.httpEndpoint);
         }
         jobAssignment = response.data;
 
@@ -172,11 +156,24 @@ export async function startExecution(job: Job, dataController: DataController, r
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
 
-        await cloudWatchEvents.enableRule({ Name: process.env.CloudwatchEventRule }).promise();
+        await cloudWatchEvents.enableRule({ Name: CloudWatchEventRule }).promise();
     } catch (error) {
-        return await failJob(error);
+        jobExecution.status = JobStatus.Failed;
+        jobExecution.error = new ProblemDetail({
+            type: "uri://mcma.ebu.ch/rfc7807/job-processor/job-start-failure",
+            title: "Failed to start job",
+            detail: error?.message,
+            stacktrace: error?.toString(),
+        });
+        await dataController.updateExecution(jobExecution);
+
+        logger.error("Failed to start job due to error '" + error?.message + "'");
+        logger.error(error?.toString());
+        job.status = jobExecution.status;
+        job.error = jobExecution.error;
+
+        job = await dataController.updateJob(job);
     }
 
     return job;
 }
-

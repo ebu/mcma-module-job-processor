@@ -9,7 +9,7 @@ import { invokeLambdaWorker } from "@mcma/aws-lambda-worker-invoker";
 
 import { DataController } from "@local/job-processor";
 
-const { LogGroupName, TableName, PublicUrl, CloudwatchEventRule, DefaultJobTimeoutInMinutes, WorkerFunctionId } = process.env;
+const { LogGroupName, TableName, PublicUrl, CloudWatchEventRule, DefaultJobTimeoutInMinutes, WorkerFunctionId } = process.env;
 
 const cloudWatchEvents = new CloudWatchEvents();
 const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-checker", LogGroupName);
@@ -24,7 +24,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
     const logger = loggerProvider.get(context.awsRequestId, tracker);
     try {
-        await cloudWatchEvents.disableRule({ Name: CloudwatchEventRule }).promise();
+        await cloudWatchEvents.disableRule({ Name: CloudWatchEventRule }).promise();
 
         const newJobs = await dataController.queryJobs({ status: JobStatus.New });
         const queuedJobs = await dataController.queryJobs({ status: JobStatus.Queued });
@@ -92,7 +92,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
         if (activeJobs) {
             logger.info(`There are ${activeJobs} active jobs remaining`);
-            await cloudWatchEvents.enableRule({ Name: CloudwatchEventRule }).promise();
+            await cloudWatchEvents.enableRule({ Name: CloudWatchEventRule }).promise();
         }
     } catch (error) {
         logger.error(error?.toString());
