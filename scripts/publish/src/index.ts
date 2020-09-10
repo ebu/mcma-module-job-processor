@@ -33,12 +33,21 @@ async function main() {
     }
 
     console.log("Uploading AWS version");
-    await s3.upload({
-        Bucket: MODULE_REPOSITORY,
-        Key: objectKey,
-        Body: fs.createReadStream("../../aws/build/dist/module.zip"),
-        ACL: "public-read"
-    }).promise();
+    try {
+        await s3.upload({
+            Bucket: MODULE_REPOSITORY,
+            Key: objectKey,
+            Body: fs.createReadStream("../../aws/build/dist/module.zip"),
+            ACL: "public-read"
+        }).promise();
+    } catch (error) {
+        // in case of a private bucket with restrictions we just try again without public-read ACL
+        await s3.upload({
+            Bucket: MODULE_REPOSITORY,
+            Key: objectKey,
+            Body: fs.createReadStream("../../aws/build/dist/module.zip")
+        }).promise();
+    }
 }
 
 main().then(() => console.log("Done")).catch(reason => console.error(reason));
