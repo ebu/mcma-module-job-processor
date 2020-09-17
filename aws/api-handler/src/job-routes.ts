@@ -1,7 +1,7 @@
 ﻿import { v4 as uuidv4 } from "uuid";
 import * as AWS from "aws-sdk";
 import { HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection, } from "@mcma/api";
-import { JobProfile, JobStatus, McmaTracker } from "@mcma/core";
+import { Job, JobProfile, JobStatus, McmaTracker } from "@mcma/core";
 import { invokeLambdaWorker } from "@mcma/aws-lambda-worker-invoker";
 import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
 import { awsV4Auth } from "@mcma/aws-client";
@@ -36,7 +36,7 @@ export class JobRoutes extends McmaApiRouteCollection {
     }
 
     async addJob(requestContext: McmaApiRequestContext) {
-        let job = requestContext.getRequestBody();
+        let job = requestContext.getRequestBody<Job>();
 
         job.status = JobStatus.New;
         if (!job.tracker) {
@@ -44,7 +44,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
             try {
                 const resourceManager = resourceManagerProvider.get(requestContext);
-                const jobProfile = await resourceManager.get<JobProfile>(job.jobProfile);
+                const jobProfile = await resourceManager.get<JobProfile>(job.jobProfileId);
                 label += " with JobProfile " + jobProfile.name;
             } catch (error) {
                 requestContext.getLogger().error(error);
