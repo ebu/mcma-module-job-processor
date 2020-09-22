@@ -19,18 +19,19 @@ export async function deleteJob(providers: ProviderCollection, workerRequest: Wo
             throw new McmaException(`Job with id '${jobId}' not found`);
         }
 
-        const executions = await dataController.getExecutions(jobId);
+        const jobExecutions = await dataController.getExecutions(jobId);
 
-        for (const execution of executions.results) {
-            if (execution.jobAssignmentId) {
+        for (const jobExecution of jobExecutions.results) {
+            if (jobExecution.jobAssignmentId) {
                 try {
-                    await resourceManager.delete(execution.jobAssignmentId);
+                    logger.info(`Deleting job assignment '${jobExecution.jobAssignmentId}'`);
+                    await resourceManager.delete(jobExecution.jobAssignmentId);
                 } catch (error) {
-                    logger.warn(`Failed to delete job assignment ${execution.jobAssignmentId}`);
+                    logger.warn(`Failed to delete job assignment ${jobExecution.jobAssignmentId}`);
                     logger.warn(error?.toString());
                 }
             }
-            await dataController.deleteExecution(execution.id);
+            await dataController.deleteExecution(jobExecution.id);
         }
 
         await dataController.deleteJob(job.id);

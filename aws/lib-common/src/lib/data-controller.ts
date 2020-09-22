@@ -94,8 +94,9 @@ export class DataController {
     async getExecutions(jobId: string): Promise<QueryResults<JobExecution>> {
         await this.init();
         const jobPath = extractPath(jobId);
+        const jobExecutionsPath = jobPath + "/executions";
 
-        return await this.dbTable.query({ path: jobPath });
+        return await this.dbTable.query({ path: jobExecutionsPath, sortAscending: false });
     }
 
     async getExecution(jobExecutionId: string): Promise<JobExecution> {

@@ -40,10 +40,11 @@ export async function cancelExecution(job: Job, dataController: DataController, 
     if (jobExecution) {
         if (jobExecution.jobAssignmentId) {
             try {
+                logger.info(`Canceling job assignment '${jobExecution.jobAssignmentId}'`);
                 const client = await resourceManager.getResourceEndpointClient(jobExecution.jobAssignmentId);
                 await client.post(undefined, `${jobExecution.jobAssignmentId}/cancel`);
             } catch (error) {
-                logger.warn(`Canceling job assignment '${jobExecution.jobAssignmentId} failed`);
+                logger.warn(`Canceling job assignment '${jobExecution.jobAssignmentId}' failed`);
                 logger.warn(error?.toString());
             }
         }
