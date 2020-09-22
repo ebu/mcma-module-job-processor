@@ -27,12 +27,16 @@ export async function handler(event: ScheduledEvent, context: Context) {
         await cloudWatchEvents.disableRule({ Name: CloudWatchEventRule }).promise();
 
         const newJobs = await dataController.queryJobs({ status: JobStatus.New });
+        const pendingJobs = await dataController.queryJobs({ status: JobStatus.Pending });
+        const assignedJobs = await dataController.queryJobs({ status: JobStatus.Assigned });
         const queuedJobs = await dataController.queryJobs({ status: JobStatus.Queued });
         const scheduledJobs = await dataController.queryJobs({ status: JobStatus.Scheduled });
         const runningJobs = await dataController.queryJobs({ status: JobStatus.Running });
 
         const jobs =
             newJobs.results
+                   .concat(pendingJobs.results)
+                   .concat(assignedJobs.results)
                    .concat(queuedJobs.results)
                    .concat(scheduledJobs.results)
                    .concat(runningJobs.results);

@@ -40,7 +40,7 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
 export async function startExecution(job: Job, dataController: DataController, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger): Promise<Job> {
     logger.info("Creating Job Execution");
     let jobExecution = new JobExecution({
-        status: JobStatus.Queued
+        status: JobStatus.Pending
     });
 
     jobExecution = await dataController.addExecution(job.id, jobExecution);
@@ -145,7 +145,7 @@ export async function startExecution(job: Job, dataController: DataController, r
 
         logger.info(jobAssignment);
 
-        jobExecution.status = JobStatus.Scheduled;
+        jobExecution.status = JobStatus.Assigned;
         jobExecution.jobAssignmentId = jobAssignment.id;
         jobExecution = await dataController.updateExecution(jobExecution);
 

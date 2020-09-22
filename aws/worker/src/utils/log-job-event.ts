@@ -27,7 +27,7 @@ export async function logJobEvent(logger: Logger, resourceManager: ResourceManag
     };
 
     switch (job.status) {
-        case JobStatus.Scheduled:
+        case JobStatus.Assigned:
             logger.jobStart(msg);
             break;
         case JobStatus.Failed:

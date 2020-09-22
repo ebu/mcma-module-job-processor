@@ -39,7 +39,6 @@ export async function processNotification(providers: ProviderCollection, workerR
             logger.info(`Job changed status from ${job.status} to ${notification.content.status}: ${job.id}`);
 
             switch (notification.content.status) {
-                case JobStatus.Scheduled:
                 case JobStatus.Running:
                     if (!jobExecution.actualStartDate) {
                         jobExecution.actualStartDate = new Date();
@@ -48,6 +47,9 @@ export async function processNotification(providers: ProviderCollection, workerR
                 case JobStatus.Failed:
                 case JobStatus.Canceled:
                 case JobStatus.Completed:
+                    if (!jobExecution.actualStartDate) {
+                        jobExecution.actualStartDate = new Date();
+                    }
                     if (!jobExecution.actualEndDate) {
                         jobExecution.actualEndDate = new Date();
                     }
