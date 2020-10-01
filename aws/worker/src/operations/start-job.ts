@@ -173,6 +173,8 @@ export async function startExecution(job: Job, dataController: DataController, r
         job.error = jobExecution.error;
 
         job = await dataController.updateJob(job);
+
+        await logJobEvent(logger, resourceManager, job, jobExecution);
     }
 
     return job;
