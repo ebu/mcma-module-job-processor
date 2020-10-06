@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, Context } from "aws-lambda";
+import { APIGatewayProxyEventV2, Context } from "aws-lambda";
 import { McmaApiRouteCollection } from "@mcma/api";
 import { ApiGatewayApiController } from "@mcma/aws-api-gateway";
 import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
@@ -19,7 +19,7 @@ const routes = new McmaApiRouteCollection().addRoutes(jobRoutes).addRoutes(jobEx
 
 const restController = new ApiGatewayApiController(routes, loggerProvider);
 
-export async function handler(event: APIGatewayProxyEvent, context: Context) {
+export async function handler(event: APIGatewayProxyEventV2, context: Context) {
     console.log(JSON.stringify(event, null, 2));
     console.log(JSON.stringify(context, null, 2));
 

@@ -9,3 +9,7 @@ output "jobs_url" {
 output "table_stream_arn" {
   value = aws_dynamodb_table.service_table.stream_arn
 }
+
+output "apigateway_execution_arn" {
+  value = aws_apigatewayv2_stage.service_api.execution_arn
+}
