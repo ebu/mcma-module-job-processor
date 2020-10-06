@@ -235,7 +235,10 @@ resource "aws_lambda_function" "periodic_job_checker" {
 resource "aws_cloudwatch_event_rule" "periodic_job_checker_trigger" {
   name                = format("%.64s", "${var.module_prefix}-periodic-job-checker-trigger")
   schedule_expression = "cron(* * * * ? *)"
-  is_enabled          = true
+
+  lifecycle {
+    ignore_changes = [is_enabled]
+  }
 
   tags = var.tags
 }
