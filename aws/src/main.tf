@@ -428,6 +428,9 @@ resource "aws_apigatewayv2_stage" "service_api" {
   stage_variables = {
     TableName        = aws_dynamodb_table.service_table.name
     PublicUrl        = local.service_url
+    ServicesUrl      = var.service_registry.services_url
+    ServicesAuthType = var.service_registry.auth_type
+    WorkerFunctionId = aws_lambda_function.worker.function_name
   }
 
   default_route_settings {
