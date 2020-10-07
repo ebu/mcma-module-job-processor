@@ -183,7 +183,7 @@ resource "aws_lambda_function" "api_handler" {
       LogGroupName     = var.log_group.name
       TableName        = aws_dynamodb_table.service_table.name
       PublicUrl        = local.service_url
-      WorkerFunctionId = aws_lambda_function.worker.function_name
+      WorkerFunctionId = local.worker_lambda_name
     }
   }
 
@@ -221,7 +221,7 @@ resource "aws_lambda_function" "periodic_job_checker" {
       ServicesAuthType           = var.service_registry.auth_type
       CloudWatchEventRule        = aws_cloudwatch_event_rule.periodic_job_checker_trigger.name,
       DefaultJobTimeoutInMinutes = var.default_job_timeout_in_minutes
-      WorkerFunctionId           = aws_lambda_function.worker.function_name
+      WorkerFunctionId           = local.worker_lambda_name
     }
   }
 
@@ -282,7 +282,7 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
       ServicesUrl              = var.service_registry.services_url
       ServicesAuthType         = var.service_registry.auth_type
       JobRetentionPeriodInDays = var.job_retention_period_in_days
-      WorkerFunctionId         = aws_lambda_function.worker.function_name
+      WorkerFunctionId         = local.worker_lambda_name
     }
   }
 
@@ -430,7 +430,7 @@ resource "aws_apigatewayv2_stage" "service_api" {
     PublicUrl        = local.service_url
     ServicesUrl      = var.service_registry.services_url
     ServicesAuthType = var.service_registry.auth_type
-    WorkerFunctionId = aws_lambda_function.worker.function_name
+    WorkerFunctionId = local.worker_lambda_name
   }
 
   default_route_settings {
