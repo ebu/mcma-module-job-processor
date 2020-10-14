@@ -139,6 +139,6 @@ export class DataController {
 
     async createMutex(mutexName: string, mutexHolder: string): Promise<DocumentDatabaseMutex> {
         await this.init();
-        return this.dbTable.createMutex(mutexName, mutexHolder);
+        return this.dbTable.createMutex(mutexName, mutexHolder, 180000);
     }
 }
