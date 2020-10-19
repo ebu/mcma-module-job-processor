@@ -183,6 +183,8 @@ resource "aws_lambda_function" "api_handler" {
       LogGroupName     = var.log_group.name
       TableName        = aws_dynamodb_table.service_table.name
       PublicUrl        = local.service_url
+      ServicesUrl      = var.service_registry.services_url
+      ServicesAuthType = var.service_registry.auth_type
       WorkerFunctionId = local.worker_lambda_name
     }
   }
@@ -426,11 +428,7 @@ resource "aws_apigatewayv2_stage" "service_api" {
   auto_deploy = true
 
   stage_variables = {
-    TableName        = aws_dynamodb_table.service_table.name
-    PublicUrl        = local.service_url
-    ServicesUrl      = var.service_registry.services_url
-    ServicesAuthType = var.service_registry.auth_type
-    WorkerFunctionId = local.worker_lambda_name
+
   }
 
   default_route_settings {
