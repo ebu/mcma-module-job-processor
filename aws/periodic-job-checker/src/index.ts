@@ -1,20 +1,22 @@
-import { v4 as uuidv4 } from "uuid";
-
-import { CloudWatchEvents } from "aws-sdk";
 import { Context, ScheduledEvent } from "aws-lambda";
+import * as AWSXRay from "aws-xray-sdk-core";
+import { v4 as uuidv4 } from "uuid";
 
 import { Job, JobStatus, McmaTracker, ProblemDetail } from "@mcma/core";
 import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
-import { invokeLambdaWorker } from "@mcma/aws-lambda-worker-invoker";
+import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 
 import { DataController } from "@local/job-processor";
 
 const { LogGroupName, TableName, PublicUrl, CloudWatchEventRule, DefaultJobTimeoutInMinutes, WorkerFunctionId } = process.env;
 
-const cloudWatchEvents = new CloudWatchEvents();
-const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-checker", LogGroupName);
+const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
-const dataController = new DataController(TableName, PublicUrl);
+const cloudWatchEvents = new AWS.CloudWatchEvents();
+const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-checker", LogGroupName, new AWS.CloudWatchLogs());
+const workerInvoker = new LambdaWorkerInvoker(new AWS.Lambda());
+
+const dataController = new DataController(TableName, PublicUrl, false, new AWS.DynamoDB());
 
 export async function handler(event: ScheduledEvent, context: Context) {
     const tracker = new McmaTracker({
@@ -108,7 +110,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 }
 
 async function failJob(job: Job, error: ProblemDetail) {
-    await invokeLambdaWorker(WorkerFunctionId, {
+    await workerInvoker.invoke(WorkerFunctionId, {
         operationName: "FailJob",
         input: {
             jobId: job.id,

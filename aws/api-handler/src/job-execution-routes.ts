@@ -1,5 +1,5 @@
 ﻿import { HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection } from "@mcma/api";
-import { invokeLambdaWorker } from "@mcma/aws-lambda-worker-invoker";
+import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 
 import { DataController } from "@local/job-processor";
 import { buildQueryParameters } from "./queries";
@@ -7,7 +7,7 @@ import { buildQueryParameters } from "./queries";
 const { PublicUrl, WorkerFunctionId } = process.env;
 
 export class JobExecutionRoutes extends McmaApiRouteCollection {
-    constructor(private dataController: DataController) {
+    constructor(private dataController: DataController, private workerInvoker: LambdaWorkerInvoker) {
         super();
 
         this.addRoute("GET", "/jobs/{jobId}/executions", reqCtx => this.queryExecutions(reqCtx));
@@ -76,7 +76,7 @@ export class JobExecutionRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await invokeLambdaWorker(WorkerFunctionId, {
+        await this.workerInvoker.invoke(WorkerFunctionId, {
             operationName: "ProcessNotification",
             input: {
                 jobId: job.id,

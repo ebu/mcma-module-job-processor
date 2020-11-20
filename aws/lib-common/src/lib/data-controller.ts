@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import { DynamoDB } from "aws-sdk";
 
-import { Job, JobExecution } from "@mcma/core";
+import { Job, JobExecution, Logger } from "@mcma/core";
 import { DocumentDatabaseMutex, DocumentDatabaseTable, QueryResults } from "@mcma/data";
 import { createJobResourceQuery, JobResourceQueryParameters } from "./custom-queries";
 import { DynamoDbTableOptions, DynamoDbTableProvider } from "@mcma/aws-dynamodb";
@@ -10,7 +11,7 @@ function extractPath(id: string): string {
     return id.substr(startIdx);
 }
 
-function getDynamoDbOptions(consistentRead?: boolean): DynamoDbTableOptions {
+function getDynamoDbOptions(consistentRead: boolean): DynamoDbTableOptions {
     return {
         topLevelAttributeMappings: {
             resource_status: (partitionKey, sortKey, resource) => `${partitionKey}-${resource.status}`,
@@ -28,8 +29,8 @@ export class DataController {
     private dbTableProvider: DynamoDbTableProvider;
     private dbTable: DocumentDatabaseTable;
 
-    constructor(private tableName: string, private publicUrl: string, consistentRead?: boolean) {
-        this.dbTableProvider = new DynamoDbTableProvider(getDynamoDbOptions(consistentRead));
+    constructor(private tableName: string, private publicUrl: string, consistentRead: boolean, dynamoDB: DynamoDB) {
+        this.dbTableProvider = new DynamoDbTableProvider(getDynamoDbOptions(consistentRead), dynamoDB);
     }
 
     private async init() {
@@ -137,8 +138,13 @@ export class DataController {
         return this.dbTable.delete(jobExecutionPath);
     }
 
-    async createMutex(mutexName: string, mutexHolder: string): Promise<DocumentDatabaseMutex> {
+    async createMutex(mutexName: string, mutexHolder: string, logger: Logger): Promise<DocumentDatabaseMutex> {
         await this.init();
-        return this.dbTable.createMutex(mutexName, mutexHolder, 180000);
+        return this.dbTable.createMutex({
+            name: mutexName,
+            holder: mutexHolder,
+            lockTimeout: 180000,
+            logger
+        });
     }
 }

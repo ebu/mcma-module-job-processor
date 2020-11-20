@@ -1,21 +1,17 @@
 ﻿import { v4 as uuidv4 } from "uuid";
-import * as AWS from "aws-sdk";
+
 import { HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection, } from "@mcma/api";
 import { Job, JobProfile, JobStatus, McmaTracker } from "@mcma/core";
-import { invokeLambdaWorker } from "@mcma/aws-lambda-worker-invoker";
-import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
-import { awsV4Auth } from "@mcma/aws-client";
+import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
+import { ResourceManagerProvider } from "@mcma/client";
 
 import { DataController } from "@local/job-processor";
 import { buildQueryParameters } from "./queries";
 
 const { PublicUrl, WorkerFunctionId } = process.env;
 
-const authProvider = new AuthProvider().add(awsV4Auth(AWS));
-const resourceManagerProvider = new ResourceManagerProvider(authProvider);
-
 export class JobRoutes extends McmaApiRouteCollection {
-    constructor(private dataController: DataController) {
+    constructor(private dataController: DataController, private resourceManagerProvider: ResourceManagerProvider, private workerInvoker: LambdaWorkerInvoker) {
         super();
 
         this.addRoute("GET", "/jobs", reqCtx => this.queryJobs(reqCtx));
@@ -43,7 +39,7 @@ export class JobRoutes extends McmaApiRouteCollection {
             let label = job["@type"];
 
             try {
-                const resourceManager = resourceManagerProvider.get(requestContext.environmentVariables);
+                const resourceManager = this.resourceManagerProvider.get(requestContext.configVariables);
                 const jobProfile = await resourceManager.get<JobProfile>(job.jobProfileId);
                 label += " with JobProfile " + jobProfile.name;
             } catch (error) {
@@ -58,7 +54,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseBody(job);
 
-        await invokeLambdaWorker(WorkerFunctionId, {
+        await this.workerInvoker.invoke(WorkerFunctionId, {
             operationName: "StartJob",
             input: {
                 jobId: job.id
@@ -99,7 +95,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await invokeLambdaWorker(WorkerFunctionId, {
+        await this.workerInvoker.invoke(WorkerFunctionId, {
             operationName: "DeleteJob",
             input: {
                 jobId: job.id
@@ -127,7 +123,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await invokeLambdaWorker(WorkerFunctionId, {
+        await this.workerInvoker.invoke(WorkerFunctionId, {
             operationName: "CancelJob",
             input: {
                 jobId: job.id
@@ -153,7 +149,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await invokeLambdaWorker(WorkerFunctionId, {
+        await this.workerInvoker.invoke(WorkerFunctionId, {
             operationName: "RestartJob",
             input: {
                 jobId: job.id

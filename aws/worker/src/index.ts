@@ -1,5 +1,6 @@
 import { Context } from "aws-lambda";
-import * as AWS from "aws-sdk";
+import * as AWSXRay from "aws-xray-sdk-core";
+
 import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
 import { ProviderCollection, Worker, WorkerRequest, WorkerRequestProperties } from "@mcma/worker";
 import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
@@ -11,11 +12,14 @@ import { cancelJob, deleteJob, failJob, processNotification, restartJob, startJo
 
 const { TableName, PublicUrl } = process.env;
 
-const authProvider = new AuthProvider().add(awsV4Auth(AWS));
-const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-worker", process.env.LogGroupName);
-const resourceManagerProvider = new ResourceManagerProvider(authProvider);
+const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
-const dataController = new DataController(TableName, PublicUrl, true);
+const authProvider = new AuthProvider().add(awsV4Auth(AWS));
+const resourceManagerProvider = new ResourceManagerProvider(authProvider);
+const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-worker", process.env.LogGroupName, new AWS.CloudWatchLogs());
+
+const dataController = new DataController(TableName, PublicUrl, true, new AWS.DynamoDB());
+const cloudWatchEvents = new AWS.CloudWatchEvents();
 
 const providerCollection = new ProviderCollection({
     authProvider,
@@ -40,7 +44,11 @@ export async function handler(event: WorkerRequestProperties, context: Context) 
         logger.debug(event);
         logger.debug(context);
 
-        await worker.doWork(new WorkerRequest(event, logger), { awsRequestId: context.awsRequestId, dataController });
+        await worker.doWork(new WorkerRequest(event, logger), {
+            awsRequestId: context.awsRequestId,
+            dataController,
+            cloudWatchEvents
+        });
     } catch (error) {
         logger.error("Error occurred when handling operation '" + event.operationName + "'");
         logger.error(error.toString());

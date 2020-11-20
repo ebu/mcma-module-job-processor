@@ -9,16 +9,14 @@ import { logJobEvent } from "../utils";
 
 const { CloudWatchEventRule } = process.env;
 
-const cloudWatchEvents = new CloudWatchEvents();
-
-export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {
+export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }) {
     const jobId = workerRequest.input.jobId;
 
     const logger = workerRequest.logger;
     const resourceManager = providers.resourceManagerProvider.get();
 
     const dataController = context.dataController;
-    const mutex = await dataController.createMutex(jobId, context.awsRequestId);
+    const mutex = await dataController.createMutex(jobId, context.awsRequestId, logger);
 
     let job: Job;
 
@@ -29,7 +27,7 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
             throw new McmaException(`Job with id '${jobId}' not found`);
         }
 
-        job = await startExecution(job, dataController, resourceManager, providers.authProvider, logger);
+        job = await startExecution(job, dataController, resourceManager, providers.authProvider, logger, context.cloudWatchEvents);
     } finally {
         await mutex.unlock();
     }
@@ -37,7 +35,7 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
     await resourceManager.sendNotification(job);
 }
 
-export async function startExecution(job: Job, dataController: DataController, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger): Promise<Job> {
+export async function startExecution(job: Job, dataController: DataController, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger, cloudWatchEvents: CloudWatchEvents): Promise<Job> {
     logger.info("Creating Job Execution");
     let jobExecution = new JobExecution({
         status: JobStatus.Pending

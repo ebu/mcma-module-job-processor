@@ -12,7 +12,7 @@ export async function cancelJob(providers: ProviderCollection, workerRequest: Wo
     const resourceManager = providers.resourceManagerProvider.get();
 
     const dataController = context.dataController;
-    const mutex = await dataController.createMutex(jobId, context.awsRequestId);
+    const mutex = await dataController.createMutex(jobId, context.awsRequestId, logger);
 
     let job: Job;
 

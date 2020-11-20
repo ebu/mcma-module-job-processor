@@ -2,9 +2,9 @@
 # Environment Variables
 #########################
 
-variable "module_prefix" {
+variable "name" {
   type        = string
-  description = "Prefix for all managed resources in this module"
+  description = "Name that serves as prefix for all managed resources in this module"
 }
 
 variable "stage_name" {
@@ -33,7 +33,7 @@ variable "dead_letter_config_target" {
 }
 
 variable "tags" {
-  type        = object({})
+  type        = map(string)
   description = "Tags applied to created resources"
   default     = {}
 }

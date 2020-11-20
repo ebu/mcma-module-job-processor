@@ -11,7 +11,7 @@ export async function failJob(providers: ProviderCollection, workerRequest: Work
     const resourceManager = providers.resourceManagerProvider.get();
 
     const dataController = context.dataController;
-    const mutex = await dataController.createMutex(jobId, context.awsRequestId);
+    const mutex = await dataController.createMutex(jobId, context.awsRequestId, logger);
 
     await mutex.lock();
     try {
