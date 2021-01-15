@@ -143,7 +143,6 @@ export class DataController {
         return this.dbTable.createMutex({
             name: mutexName,
             holder: mutexHolder,
-            lockTimeout: 180000,
             logger
         });
     }
