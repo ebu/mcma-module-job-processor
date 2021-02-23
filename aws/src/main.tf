@@ -178,6 +178,8 @@ resource "aws_lambda_function" "api_handler" {
   timeout          = "30"
   memory_size      = "3008"
 
+  layers = var.enhanced_monitoring_enabled ? [ "arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14" ] : []
+
   environment {
     variables = {
       LogGroupName     = var.log_group.name
@@ -213,6 +215,8 @@ resource "aws_lambda_function" "periodic_job_checker" {
   runtime          = "nodejs12.x"
   timeout          = "900"
   memory_size      = "3008"
+
+  layers = var.enhanced_monitoring_enabled ? [ "arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14" ] : []
 
   environment {
     variables = {
@@ -276,6 +280,8 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
   timeout          = "900"
   memory_size      = "3008"
 
+  layers = var.enhanced_monitoring_enabled ? [ "arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14" ] : []
+
   environment {
     variables = {
       LogGroupName             = var.log_group.name
@@ -333,6 +339,8 @@ resource "aws_lambda_function" "worker" {
   runtime          = "nodejs12.x"
   timeout          = "900"
   memory_size      = "3008"
+
+  layers = var.enhanced_monitoring_enabled ? [ "arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14" ] : []
 
   environment {
     variables = {

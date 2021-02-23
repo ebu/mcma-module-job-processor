@@ -107,3 +107,9 @@ variable "xray_tracing_enabled" {
   description = "Enable X-Ray tracing"
   default     = false
 }
+
+variable "enhanced_monitoring_enabled" {
+  type        = bool
+  description = "Enable CloudWatch Lambda Insights"
+  default     = false
+}
