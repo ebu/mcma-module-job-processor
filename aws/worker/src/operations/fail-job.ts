@@ -1,7 +1,7 @@
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
-import { JobStatus, McmaException } from "@mcma/core";
+import { Job, JobStatus, McmaException } from "@mcma/core";
 import { logJobEvent } from "../utils";
 
 export async function failJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {
@@ -13,9 +13,11 @@ export async function failJob(providers: ProviderCollection, workerRequest: Work
     const dataController = context.dataController;
     const mutex = await dataController.createMutex(jobId, context.awsRequestId, logger);
 
+    let job: Job;
+
     await mutex.lock();
     try {
-        const job = await dataController.getJob(jobId);
+        job = await dataController.getJob(jobId);
         if (!job) {
             throw new McmaException(`Job with id '${jobId}' not found`);
         }
@@ -61,4 +63,6 @@ export async function failJob(providers: ProviderCollection, workerRequest: Work
     } finally {
         await mutex.unlock();
     }
+
+    await resourceManager.sendNotification(job);
 }
