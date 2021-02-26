@@ -61,6 +61,15 @@ task terraformInit(type: Exec) {
     args "init"
 }
 
+task terraformInitUpgrade(type: Exec) {
+    dependsOn ":verifyTerraform"
+    inputs.file "main.tf"
+    inputs.file "versions.tf"
+    outputs.upToDateWhen { file(".terraform").exists() }
+    commandLine terraformExecutable
+    args "init", "-upgrade"
+}
+
 task terraformPlan(type: Exec) {
     dependsOn ":verifyTerraform"
     dependsOn ":build"
