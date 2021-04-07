@@ -21,7 +21,7 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.13.23/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.13.24/module.zip"
 
   name = "${var.global_prefix}-service-registry"
 
