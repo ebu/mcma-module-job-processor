@@ -51,7 +51,7 @@ resource "aws_cloudwatch_log_metric_filter" "jobs_canceled" {
 }
 
 resource "aws_cloudwatch_dashboard" "dashboard" {
-  dashboard_name = var.dashboard_name
+  dashboard_name = "${var.dashboard_name}-${var.aws_region}"
   dashboard_body = templatefile("${path.module}/dashboard.json", {
     aws_region     = var.aws_region
     dashboard_name = var.dashboard_name

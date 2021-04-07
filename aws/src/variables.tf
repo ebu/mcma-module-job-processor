@@ -23,7 +23,7 @@ variable "log_group" {
 
 variable "dashboard_name" {
   type        = string
-  description = "Name for AWS CloudWatch dashboard"
+  description = "Name that services as prefix for dashboard related resources"
 }
 
 variable "dead_letter_config_target" {
