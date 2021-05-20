@@ -3,8 +3,14 @@
 #########################
 
 variable "name" {
+  type = string
+  description = "Optional variable to set a custom name for this service in the service registry"
+  default = "Job Processor"
+}
+
+variable "prefix" {
   type        = string
-  description = "Name that serves as prefix for all managed resources in this module"
+  description = "Prefix for all managed resources in this module"
 }
 
 variable "stage_name" {
@@ -112,4 +118,14 @@ variable "enhanced_monitoring_enabled" {
   type        = bool
   description = "Enable CloudWatch Lambda Insights"
   default     = false
+}
+
+#########################
+# Custom Job Types
+#########################
+
+variable "custom_job_types" {
+  type        = list(string)
+  description = "Optionally add custom job types"
+  default     = []
 }

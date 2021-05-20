@@ -3,7 +3,7 @@
 ##################################
 
 resource "aws_iam_role" "lambda_execution" {
-  name               = format("%.64s", "${var.name}.${var.aws_region}.lambda-execution")
+  name               = format("%.64s", "${var.prefix}.${var.aws_region}.lambda-execution")
   path               = var.iam_role_path
   assume_role_policy = jsonencode({
     Version   = "2012-10-17",
@@ -23,7 +23,7 @@ resource "aws_iam_role" "lambda_execution" {
 }
 
 resource "aws_iam_policy" "lambda_execution" {
-  name        = format("%.128s", "${var.name}.${var.aws_region}.lambda-execution")
+  name        = format("%.128s", "${var.prefix}.${var.aws_region}.lambda-execution")
   description = "Policy to write to log"
   path        = var.iam_policy_path
   policy      = jsonencode({
@@ -115,7 +115,7 @@ resource "aws_iam_role_policy_attachment" "lambda_execution" {
 ######################
 
 resource "aws_dynamodb_table" "service_table" {
-  name         = var.name
+  name         = var.prefix
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "resource_pkey"
   range_key    = "resource_skey"
@@ -170,7 +170,7 @@ resource "aws_lambda_function" "api_handler" {
   ]
 
   filename         = "${path.module}/lambdas/api-handler.zip"
-  function_name    = format("%.64s", replace("${var.name}-api-handler", "/[^a-zA-Z0-9_]+/", "-" ))
+  function_name    = format("%.64s", replace("${var.prefix}-api-handler", "/[^a-zA-Z0-9_]+/", "-" ))
   role             = aws_iam_role.lambda_execution.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/lambdas/api-handler.zip")
@@ -208,7 +208,7 @@ resource "aws_lambda_function" "periodic_job_checker" {
   ]
 
   filename         = "${path.module}/lambdas/periodic-job-checker.zip"
-  function_name    = format("%.64s", replace("${var.name}-periodic-job-checker", "/[^a-zA-Z0-9_]+/", "-" ))
+  function_name    = format("%.64s", replace("${var.prefix}-periodic-job-checker", "/[^a-zA-Z0-9_]+/", "-" ))
   role             = aws_iam_role.lambda_execution.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/lambdas/periodic-job-checker.zip")
@@ -239,7 +239,7 @@ resource "aws_lambda_function" "periodic_job_checker" {
 }
 
 resource "aws_cloudwatch_event_rule" "periodic_job_checker_trigger" {
-  name                = format("%.64s", "${var.name}-periodic-job-checker-trigger")
+  name                = format("%.64s", "${var.prefix}-periodic-job-checker-trigger")
   schedule_expression = "cron(* * * * ? *)"
 
   lifecycle {
@@ -272,7 +272,7 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
   ]
 
   filename         = "${path.module}/lambdas/periodic-job-cleanup.zip"
-  function_name    = format("%.64s", replace("${var.name}-periodic-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
+  function_name    = format("%.64s", replace("${var.prefix}-periodic-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
   role             = aws_iam_role.lambda_execution.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/lambdas/periodic-job-cleanup.zip")
@@ -302,7 +302,7 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
 }
 
 resource "aws_cloudwatch_event_rule" "periodic_job_cleanup_trigger" {
-  name                = format("%.64s", "${var.name}-periodic-job-cleanup-trigger")
+  name                = format("%.64s", "${var.prefix}-periodic-job-cleanup-trigger")
   schedule_expression = "cron(0 0 * * ? *)"
   is_enabled          = true
 
@@ -373,7 +373,7 @@ resource "aws_lambda_function" "worker" {
 ##############################
 
 resource "aws_apigatewayv2_api" "service_api" {
-  name          = var.name
+  name          = var.prefix
   description   = "Job Processor Rest Api"
   protocol_type = "HTTP"
 
@@ -454,5 +454,5 @@ resource "aws_apigatewayv2_stage" "service_api" {
 locals {
   service_url        = "${aws_apigatewayv2_api.service_api.api_endpoint}/${var.stage_name}"
   service_auth_type  = "AWS4"
-  worker_lambda_name = format("%.64s", replace("${var.name}-worker", "/[^a-zA-Z0-9_]+/", "-" ))
+  worker_lambda_name = format("%.64s", replace("${var.prefix}-worker", "/[^a-zA-Z0-9_]+/", "-" ))
 }
