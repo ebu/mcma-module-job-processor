@@ -6,5 +6,4 @@ include "aws",
         "aws:worker",
         "deployment",
         "scripts",
-        "scripts:post-deploy",
         "scripts:publish"

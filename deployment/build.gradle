@@ -93,7 +93,7 @@ task terraformDestroy(type: Exec) {
     dependsOn terraformInit
     dependsOn generateTerraformTFVars
     commandLine terraformExecutable
-    args "destroy", "-force"
+    args "destroy", "-auto-approve"
 }
 
 task terraformOutput(type: Exec) {
@@ -124,7 +124,6 @@ plan.dependsOn(terraformPlan)
 
 task apply {}
 apply.dependsOn(terraformApply)
-apply.dependsOn(":scripts:post-deploy:run")
 
 task deploy {}
 deploy.dependsOn(apply)
