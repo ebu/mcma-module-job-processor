@@ -42,7 +42,7 @@ module "service_registry_aws" {
 module "job_processor_aws" {
   source = "../aws/build/staging"
 
-  name = "${var.global_prefix}-job-processor"
+  prefix = "${var.global_prefix}-job-processor"
 
   stage_name     = var.environment_type
   dashboard_name = var.global_prefix
