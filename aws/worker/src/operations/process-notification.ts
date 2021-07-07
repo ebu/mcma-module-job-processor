@@ -30,13 +30,13 @@ export async function processNotification(providers: ProviderCollection, workerR
         }
 
         // not updating job if it already was marked as completed or failed.
-        if (job.status === JobStatus.Completed || job.status === JobStatus.Failed || job.status === JobStatus.Canceled) {
-            logger.warn(`Ignoring notification for job that would change state from ${job.status} to ${notification.content.status}: ${job.id}`);
+        if (jobExecution.status === JobStatus.Completed || jobExecution.status === JobStatus.Failed || jobExecution.status === JobStatus.Canceled) {
+            logger.warn(`Ignoring notification for job execution that would change state from ${jobExecution.status} to ${notification.content.status}: ${jobExecution.id}`);
             return;
         }
 
-        if (job.status !== notification.content.status) {
-            logger.info(`Job changed status from ${job.status} to ${notification.content.status}: ${job.id}`);
+        if (jobExecution.status !== notification.content.status) {
+            logger.info(`Job execution changed status from ${job.status} to ${notification.content.status}: ${job.id}`);
 
             switch (notification.content.status) {
                 case JobStatus.Running:
