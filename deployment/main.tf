@@ -3,9 +3,8 @@
 #########################
 
 provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-  region     = var.aws_region
+  profile = var.aws_profile
+  region  = var.aws_region
 }
 
 ############################################
@@ -21,9 +20,9 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.13.24/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.13.27/module.zip"
 
-  name = "${var.global_prefix}-service-registry"
+  prefix = "${var.global_prefix}-service-registry"
 
   aws_account_id = var.aws_account_id
   aws_region     = var.aws_region
@@ -33,6 +32,10 @@ module "service_registry_aws" {
   api_gateway_logging_enabled = true
   api_gateway_metrics_enabled = true
   xray_tracing_enabled        = true
+
+  services = [
+    module.job_processor_aws.service_definition
+  ]
 }
 
 #########################
@@ -51,6 +54,9 @@ module "job_processor_aws" {
   aws_region     = var.aws_region
 
   service_registry = module.service_registry_aws
+  execute_api_arns = [
+    "${module.service_registry_aws.aws_apigatewayv2_stage.service_api.execution_arn}/*/*"
+  ]
 
   log_group                   = aws_cloudwatch_log_group.main
   api_gateway_logging_enabled = true

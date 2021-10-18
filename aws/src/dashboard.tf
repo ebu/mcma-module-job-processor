@@ -1,3 +1,7 @@
+##############################
+# CloudWatch Dashboard
+##############################
+
 resource "aws_cloudwatch_log_metric_filter" "jobs_started" {
   name           = "${var.dashboard_name}-type-JOB_START"
   pattern        = "{ $.type = \"JOB_START\" }"

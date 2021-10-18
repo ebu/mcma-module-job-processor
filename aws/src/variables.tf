@@ -3,9 +3,9 @@
 #########################
 
 variable "name" {
-  type = string
+  type        = string
   description = "Optional variable to set a custom name for this service in the service registry"
-  default = "Job Processor"
+  default     = "Job Processor"
 }
 
 variable "prefix" {
@@ -79,6 +79,12 @@ variable "service_registry" {
     auth_type    = string,
     services_url = string,
   })
+}
+
+variable "execute_api_arns" {
+  type        = list(string)
+  description = "Optional ist of api gateway execution arns that will allow you to control which API's the lambdas are allowed to invoke"
+  default     = ["arn:aws:execute-api:*:*:*"]
 }
 
 #########################

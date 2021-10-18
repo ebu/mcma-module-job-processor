@@ -4,8 +4,7 @@ task generateTerraformTFVars {
     inputs.property("environment_name", environmentName)
     inputs.property("environment_type", environmentType)
     inputs.property("aws_account_id", awsAccountId)
-    inputs.property("aws_access_key", awsAccessKey)
-    inputs.property("aws_secret_key", awsSecretKey)
+    inputs.property("aws_profile", awsProfile)
     inputs.property("aws_region", awsRegion)
 
     def propertyFile = file("${projectDir}/terraform.tfvars.json")
@@ -13,42 +12,19 @@ task generateTerraformTFVars {
 
     doLast {
         def data = [
-                environment_name       : environmentName,
-                environment_type       : environmentType,
-                global_prefix          : "${environmentName}.${environmentType}".replace(".", "-"),
+                environment_name: environmentName,
+                environment_type: environmentType,
+                global_prefix   : "${environmentName}.${environmentType}".replace(".", "-"),
 
-                aws_account_id         : awsAccountId,
-                aws_access_key         : awsAccessKey,
-                aws_secret_key         : awsSecretKey,
-                aws_region             : awsRegion,
+                aws_account_id  : awsAccountId,
+                aws_profile     : awsProfile,
+                aws_region      : awsRegion,
         ]
 
         def json = JsonOutput.toJson(data)
         def jsonPretty = JsonOutput.prettyPrint(json)
 
         propertyFile.write(jsonPretty)
-    }
-}
-
-task generateAwsCredentialsJson {
-    inputs.property("AWS_ACCESS_KEY", "${awsAccessKey}")
-    inputs.property("AWS_SECRET_KEY", "${awsSecretKey}")
-    inputs.property("AWS_REGION", "${awsRegion}")
-
-    def awsCredentialsJson = file("aws-credentials.json")
-    outputs.file(awsCredentialsJson)
-
-    doLast {
-        def data = [
-                accessKeyId    : awsAccessKey,
-                secretAccessKey: awsSecretKey,
-                region         : awsRegion
-        ]
-
-        def json = JsonOutput.toJson(data)
-        def jsonPretty = JsonOutput.prettyPrint(json)
-
-        awsCredentialsJson.write(jsonPretty)
     }
 }
 
@@ -59,6 +35,7 @@ task terraformInit(type: Exec) {
     outputs.upToDateWhen { file(".terraform").exists() }
     commandLine terraformExecutable
     args "init"
+    environment "AWS_PROFILE", awsProfile
 }
 
 task terraformInitUpgrade(type: Exec) {
@@ -68,6 +45,7 @@ task terraformInitUpgrade(type: Exec) {
     outputs.upToDateWhen { file(".terraform").exists() }
     commandLine terraformExecutable
     args "init", "-upgrade"
+    environment "AWS_PROFILE", awsProfile
 }
 
 task terraformPlan(type: Exec) {
@@ -112,10 +90,7 @@ task terraformOutput(type: Exec) {
 
 task clean(type: Delete) {
     delete "${projectDir}/.terraform"
-    delete "${projectDir}/aws-credentials.json"
-    delete "${projectDir}/terraform.output"
     delete "${projectDir}/terraform.output.json"
-    delete "${projectDir}/terraform.tfvars"
     delete "${projectDir}/terraform.tfvars.json"
 }
 
