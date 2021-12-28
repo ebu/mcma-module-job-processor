@@ -11,12 +11,12 @@ resource "aws_iam_role" "api_handler" {
   path = var.iam_role_path
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = [
       {
         Sid       = "AllowLambdaAssumingRole"
         Effect    = "Allow"
-        Action    = "sts:AssumeRole",
+        Action    = "sts:AssumeRole"
         Principal = {
           "Service" = "lambda.amazonaws.com"
         }
@@ -32,7 +32,7 @@ resource "aws_iam_role_policy" "api_handler" {
   role = aws_iam_role.api_handler.id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = concat([
       {
         Sid      = "DescribeCloudWatchLogs"
@@ -47,56 +47,54 @@ resource "aws_iam_role_policy" "api_handler" {
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-        ],
+        ]
         Resource = concat([
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:${var.log_group.name}:*",
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_api_handler}:*",
         ], var.enhanced_monitoring_enabled ? [
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*"
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*",
         ] : [])
       },
       {
-        Sid      = "ListAndDescribeDynamoDBTables",
-        Effect   = "Allow",
+        Sid      = "ListAndDescribeDynamoDBTables"
+        Effect   = "Allow"
         Action   = [
           "dynamodb:List*",
           "dynamodb:DescribeReservedCapacity*",
           "dynamodb:DescribeLimits",
-          "dynamodb:DescribeTimeToLive"
+          "dynamodb:DescribeTimeToLive",
         ],
         Resource = "*"
       },
       {
-        Sid      = "SpecificTable",
-        Effect   = "Allow",
+        Sid      = "AllowTableOperations"
+        Effect   = "Allow"
         Action   = [
-          "dynamodb:BatchGet*",
-          "dynamodb:DescribeStream",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:DeleteItem",
           "dynamodb:DescribeTable",
-          "dynamodb:Get*",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
           "dynamodb:Query",
           "dynamodb:Scan",
-          "dynamodb:BatchWrite*",
-          "dynamodb:CreateTable",
-          "dynamodb:Delete*",
-          "dynamodb:Update*",
-          "dynamodb:PutItem"
-        ],
+          "dynamodb:UpdateItem",
+        ]
         Resource = [
           aws_dynamodb_table.service_table.arn,
-          "${aws_dynamodb_table.service_table.arn}/index/*"
+          "${aws_dynamodb_table.service_table.arn}/index/*",
         ]
       },
       {
-        Sid      = "AllowInvokingWorkerLambda",
-        Effect   = "Allow",
-        Action   = "lambda:InvokeFunction",
+        Sid      = "AllowInvokingWorkerLambda"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
         Resource = "arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${local.lambda_name_worker}"
       },
       {
         Sid      = "AllowInvokingApiGateway"
-        Effect   = "Allow",
-        Action   = "execute-api:Invoke",
+        Effect   = "Allow"
+        Action   = "execute-api:Invoke"
         Resource = var.execute_api_arns
       },
     ],
@@ -104,7 +102,7 @@ resource "aws_iam_role_policy" "api_handler" {
     [
       {
         Sid      = "AllowLambdaWritingToXRay"
-        Effect   = "Allow",
+        Effect   = "Allow"
         Action   = [
           "xray:PutTraceSegments",
           "xray:PutTelemetryRecords",

@@ -11,12 +11,12 @@ resource "aws_iam_role" "periodic_job_cleanup" {
   path = var.iam_role_path
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = [
       {
         Sid       = "AllowLambdaAssumingRole"
         Effect    = "Allow"
-        Action    = "sts:AssumeRole",
+        Action    = "sts:AssumeRole"
         Principal = {
           "Service" = "lambda.amazonaws.com"
         }
@@ -32,7 +32,7 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
   role = aws_iam_role.periodic_job_cleanup.id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = concat([
       {
         Sid      = "DescribeCloudWatchLogs"
@@ -52,45 +52,43 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:${var.log_group.name}:*",
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_periodic_job_cleanup}:*",
         ], var.enhanced_monitoring_enabled ? [
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*"
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*",
         ] : [])
       },
       {
-        Sid      = "ListAndDescribeDynamoDBTables",
-        Effect   = "Allow",
+        Sid      = "ListAndDescribeDynamoDBTables"
+        Effect   = "Allow"
         Action   = [
           "dynamodb:List*",
           "dynamodb:DescribeReservedCapacity*",
           "dynamodb:DescribeLimits",
-          "dynamodb:DescribeTimeToLive"
+          "dynamodb:DescribeTimeToLive",
         ],
         Resource = "*"
       },
       {
-        Sid      = "SpecificTable",
-        Effect   = "Allow",
+        Sid      = "AllowTableOperations"
+        Effect   = "Allow"
         Action   = [
-          "dynamodb:BatchGet*",
-          "dynamodb:DescribeStream",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:DeleteItem",
           "dynamodb:DescribeTable",
-          "dynamodb:Get*",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
           "dynamodb:Query",
           "dynamodb:Scan",
-          "dynamodb:BatchWrite*",
-          "dynamodb:CreateTable",
-          "dynamodb:Delete*",
-          "dynamodb:Update*",
-          "dynamodb:PutItem"
-        ],
+          "dynamodb:UpdateItem",
+        ]
         Resource = [
           aws_dynamodb_table.service_table.arn,
-          "${aws_dynamodb_table.service_table.arn}/index/*"
+          "${aws_dynamodb_table.service_table.arn}/index/*",
         ]
       },
       {
-        Sid      = "AllowInvokingWorkerLambda",
-        Effect   = "Allow",
-        Action   = "lambda:InvokeFunction",
+        Sid      = "AllowInvokingWorkerLambda"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
         Resource = "arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${local.lambda_name_worker}"
       },
     ],
@@ -98,20 +96,20 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
     [
       {
         Sid      = "AllowLambdaWritingToXRay"
-        Effect   = "Allow",
+        Effect   = "Allow"
         Action   = [
           "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords"
-        ],
+          "xray:PutTelemetryRecords",
+        ]
         Resource = "*"
       }
     ] : [],
     var.dead_letter_config_target != null ?
     [
       {
-        Effect : "Allow",
-        Action : "sqs:SendMessage",
-        Resource : var.dead_letter_config_target
+        Effect   = "Allow"
+        Action   = "sqs:SendMessage"
+        Resource = var.dead_letter_config_target
       }
     ] : [])
   })

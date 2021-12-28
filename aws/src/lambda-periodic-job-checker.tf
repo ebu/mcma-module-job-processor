@@ -11,12 +11,12 @@ resource "aws_iam_role" "periodic_job_checker" {
   path = var.iam_role_path
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = [
       {
         Sid       = "AllowLambdaAssumingRole"
         Effect    = "Allow"
-        Action    = "sts:AssumeRole",
+        Action    = "sts:AssumeRole"
         Principal = {
           "Service" = "lambda.amazonaws.com"
         }
@@ -32,7 +32,7 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
   role = aws_iam_role.periodic_job_checker.id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version   = "2012-10-17"
     Statement = concat([
       {
         Sid      = "DescribeCloudWatchLogs"
@@ -47,45 +47,43 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-        ],
+        ]
         Resource = concat([
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:${var.log_group.name}:*",
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_periodic_job_checker}:*",
         ], var.enhanced_monitoring_enabled ? [
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*"
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*",
         ] : [])
       },
       {
-        Sid      = "SpecificTable",
-        Effect   = "Allow",
+        Sid      = "AllowTableOperations"
+        Effect   = "Allow"
         Action   = [
-          "dynamodb:BatchGet*",
-          "dynamodb:DescribeStream",
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:DeleteItem",
           "dynamodb:DescribeTable",
-          "dynamodb:Get*",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
           "dynamodb:Query",
           "dynamodb:Scan",
-          "dynamodb:BatchWrite*",
-          "dynamodb:CreateTable",
-          "dynamodb:Delete*",
-          "dynamodb:Update*",
-          "dynamodb:PutItem"
-        ],
+          "dynamodb:UpdateItem",
+        ]
         Resource = [
           aws_dynamodb_table.service_table.arn,
-          "${aws_dynamodb_table.service_table.arn}/index/*"
+          "${aws_dynamodb_table.service_table.arn}/index/*",
         ]
       },
       {
-        Sid      = "AllowInvokingWorkerLambda",
-        Effect   = "Allow",
-        Action   = "lambda:InvokeFunction",
+        Sid      = "AllowInvokingWorkerLambda"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
         Resource = "arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${local.lambda_name_worker}"
       },
       {
         Sid      = "AllowEnablingDisabling"
-        Effect   = "Allow",
-        Action   = ["events:EnableRule", "events:DisableRule"],
+        Effect   = "Allow"
+        Action   = ["events:EnableRule", "events:DisableRule"]
         Resource = aws_cloudwatch_event_rule.periodic_job_checker_trigger.arn
       },
     ],
@@ -93,10 +91,10 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
     [
       {
         Sid      = "AllowLambdaWritingToXRay"
-        Effect   = "Allow",
+        Effect   = "Allow"
         Action   = [
           "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords"
+          "xray:PutTelemetryRecords",
         ],
         Resource = "*"
       }
