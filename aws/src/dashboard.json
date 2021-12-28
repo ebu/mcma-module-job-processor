@@ -8,7 +8,7 @@
             "height": 6,
             "properties": {
                 "metrics": [
-                    [ "${dashboard_name}", "JobsStarted", { "color": "#1f77b4", "label": "Started" } ],
+                    [ "${namespace}", "JobsStarted", { "color": "#1f77b4", "label": "Started" } ],
                     [ ".", "JobsCompleted", { "yAxis": "left", "label": "Completed", "color": "#2ca02c" } ],
                     [ ".", "JobsFailed", { "color": "#d62728", "label": "Failed" } ],
                     [ ".", "JobsCanceled", { "color": "#7f7f7f", "label": "Canceled" } ]
@@ -69,7 +69,7 @@
             "height": 3,
             "properties": {
                 "metrics": [
-                    [ "${dashboard_name}", "JobsStarted", { "label": "Jobs Started", "id": "m1" } ],
+                    [ "${namespace}", "JobsStarted", { "label": "Jobs Started", "id": "m1" } ],
                     [ ".", "JobsCompleted", { "color": "#2ca02c", "label": "Jobs Completed", "id": "m2" } ],
                     [ ".", "JobsFailed", { "color": "#d62728", "label": "Jobs Failed", "id": "m3" } ],
                     [ ".", "JobsCanceled", { "color": "#7f7f7f", "label": "Jobs Canceled" } ]
@@ -90,7 +90,7 @@
             "properties": {
                 "metrics": [
                     [ { "expression": "100*(m2/(m1+m2+m3))", "label": "Failure rate %", "id": "e1", "stat": "Sum", "period": 2592000, "region": "${aws_region}" } ],
-                    [ "${dashboard_name}", "JobsCompleted", { "id": "m1", "visible": false } ],
+                    [ "${namespace}", "JobsCompleted", { "id": "m1", "visible": false } ],
                     [ ".", "JobsFailed", { "id": "m2", "visible": false } ],
                     [ ".", "JobsCanceled", { "id": "m3", "visible": false } ]
                 ],
@@ -123,7 +123,7 @@
             "properties": {
                 "metrics": [
                     [ { "expression": "100*(m1/(m1+m2+m3))", "label": "Success rate %", "id": "e1", "stat": "Sum", "period": 2592000, "region": "${aws_region}" } ],
-                    [ "${dashboard_name}", "JobsCompleted", { "id": "m1", "visible": false } ],
+                    [ "${namespace}", "JobsCompleted", { "id": "m1", "visible": false } ],
                     [ ".", "JobsFailed", { "id": "m2", "visible": false } ],
                     [ ".", "JobsCanceled", { "id": "m3", "visible": false } ]
                 ],
