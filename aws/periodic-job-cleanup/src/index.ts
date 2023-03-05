@@ -3,19 +3,22 @@ import * as AWSXRay from "aws-xray-sdk-core";
 import { v4 as uuidv4 } from "uuid";
 
 import { Job, JobStatus, McmaTracker } from "@mcma/core";
-import { AwsCloudWatchLoggerProvider } from "@mcma/aws-logger";
+import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 
 import { DataController } from "@local/job-processor";
+import { getTableName } from "@mcma/data";
+import { getPublicUrl } from "@mcma/api";
+import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
-const { LogGroupName, TableName, PublicUrl, JobRetentionPeriodInDays, WorkerFunctionId } = process.env;
+const { JOB_RETENTION_PERIOD_IN_DAYS } = process.env;
 
 const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
-const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-cleanup", LogGroupName, new AWS.CloudWatchLogs());
+const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-cleanup", getLogGroupName(), new AWS.CloudWatchLogs());
 const workerInvoker = new LambdaWorkerInvoker(new AWS.Lambda());
 
-const dataController = new DataController(TableName, PublicUrl, false, new AWS.DynamoDB());
+const dataController = new DataController(getTableName(), getPublicUrl(), false, new AWS.DynamoDB());
 
 export async function handler(event: ScheduledEvent, context: Context) {
     const tracker = new McmaTracker({
@@ -25,14 +28,14 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
     const logger = loggerProvider.get(context.awsRequestId, tracker);
     try {
-        logger.info(`Job Retention Period set to ${JobRetentionPeriodInDays} days`);
+        logger.info(`Job Retention Period set to ${JOB_RETENTION_PERIOD_IN_DAYS} days`);
 
-        if (Number.parseInt(JobRetentionPeriodInDays) <= 0) {
+        if (Number.parseInt(JOB_RETENTION_PERIOD_IN_DAYS) <= 0) {
             logger.info("Exiting");
             return;
         }
 
-        const retentionDateLimit = new Date(Date.now() - Number.parseInt(JobRetentionPeriodInDays) * 24 * 3600 * 1000);
+        const retentionDateLimit = new Date(Date.now() - Number.parseInt(JOB_RETENTION_PERIOD_IN_DAYS) * 24 * 3600 * 1000);
 
         const completedJobs = await dataController.queryJobs({ status: JobStatus.Completed, to: retentionDateLimit });
         const failedJobs = await dataController.queryJobs({ status: JobStatus.Failed, to: retentionDateLimit });
@@ -58,7 +61,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 }
 
 async function deleteJob(job: Job) {
-    await workerInvoker.invoke(WorkerFunctionId, {
+    await workerInvoker.invoke(getWorkerFunctionId(), {
         operationName: "DeleteJob",
         input: {
             jobId: job.id,

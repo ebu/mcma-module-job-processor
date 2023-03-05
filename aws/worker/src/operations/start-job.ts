@@ -7,7 +7,7 @@ import { DataController } from "@local/job-processor";
 
 import { logJobEvent } from "../utils";
 
-const { CloudWatchEventRule } = process.env;
+const { CLOUD_WATCH_EVENT_RULE } = process.env;
 
 export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }) {
     const jobId = workerRequest.input.jobId;
@@ -154,7 +154,7 @@ export async function startExecution(job: Job, dataController: DataController, r
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
 
-        await cloudWatchEvents.enableRule({ Name: CloudWatchEventRule }).promise();
+        await cloudWatchEvents.enableRule({ Name: CLOUD_WATCH_EVENT_RULE }).promise();
     } catch (error) {
         jobExecution.status = JobStatus.Failed;
         jobExecution.error = new ProblemDetail({
