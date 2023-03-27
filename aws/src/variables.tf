@@ -19,7 +19,7 @@ variable "stage_name" {
 }
 
 variable "log_group" {
-  type        = object({
+  type = object({
     id   = string
     arn  = string
     name = string
@@ -48,11 +48,6 @@ variable "tags" {
 # AWS Variables
 #########################
 
-variable "aws_account_id" {
-  type        = string
-  description = "Account ID to which this module is deployed"
-}
-
 variable "aws_region" {
   type        = string
   description = "AWS Region to which this module is deployed"
@@ -64,10 +59,10 @@ variable "iam_role_path" {
   default     = "/"
 }
 
-variable "iam_policy_path" {
+variable "iam_permissions_boundary" {
   type        = string
-  description = "Path for creation of access policy"
-  default     = "/"
+  description = "IAM permissions boundary"
+  default     = null
 }
 
 #########################
@@ -76,8 +71,8 @@ variable "iam_policy_path" {
 
 variable "service_registry" {
   type = object({
-    auth_type    = string,
-    services_url = string,
+    auth_type   = string,
+    service_url = string,
   })
 }
 
@@ -100,12 +95,6 @@ variable "job_retention_period_in_days" {
   type        = number
   description = "Set job retention period in days"
   default     = 90
-}
-
-variable "api_gateway_logging_enabled" {
-  type        = bool
-  description = "Enable API Gateway logging"
-  default     = false
 }
 
 variable "api_gateway_metrics_enabled" {

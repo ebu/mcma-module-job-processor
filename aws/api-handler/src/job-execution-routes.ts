@@ -1,10 +1,10 @@
-﻿import { HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection } from "@mcma/api";
+﻿import { getPublicUrl, HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection } from "@mcma/api";
+import { QuerySortOrder } from "@mcma/data";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
+import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
 import { DataController } from "@local/job-processor";
 import { buildQueryParameters } from "./queries";
-
-const { PublicUrl, WorkerFunctionId } = process.env;
 
 export class JobExecutionRoutes extends McmaApiRouteCollection {
     constructor(private dataController: DataController, private workerInvoker: LambdaWorkerInvoker) {
@@ -18,7 +18,7 @@ export class JobExecutionRoutes extends McmaApiRouteCollection {
     async queryExecutions(requestContext: McmaApiRequestContext) {
         const { jobId } = requestContext.request.pathVariables;
 
-        let job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
+        let job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
         if (!job) {
             requestContext.setResponseResourceNotFound();
             return;
@@ -38,9 +38,9 @@ export class JobExecutionRoutes extends McmaApiRouteCollection {
         let execution;
 
         if (executionId === "latest") {
-            execution = (await this.dataController.queryExecutions(`${PublicUrl}/jobs/${jobId}`, { limit: 1, ascending: false })).results[0];
+            execution = (await this.dataController.queryExecutions(`${getPublicUrl()}/jobs/${jobId}`, { pageSize: 1, sortOrder: QuerySortOrder.Descending })).results[0];
         } else {
-            execution = await this.dataController.getExecution(`${PublicUrl}/jobs/${jobId}/executions/${executionId}`);
+            execution = await this.dataController.getExecution(`${getPublicUrl()}/jobs/${jobId}/executions/${executionId}`);
         }
 
         if (!execution) {
@@ -54,8 +54,8 @@ export class JobExecutionRoutes extends McmaApiRouteCollection {
     async processNotification(requestContext: McmaApiRequestContext) {
         const { jobId, executionId } = requestContext.request.pathVariables;
 
-        let job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
-        let jobExecution = await this.dataController.getExecution(`${PublicUrl}/jobs/${jobId}/executions/${executionId}`);
+        let job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
+        let jobExecution = await this.dataController.getExecution(`${getPublicUrl()}/jobs/${jobId}/executions/${executionId}`);
 
         if (!job || !jobExecution) {
             requestContext.setResponseResourceNotFound();
@@ -69,14 +69,13 @@ export class JobExecutionRoutes extends McmaApiRouteCollection {
         }
 
         if (jobExecution.jobAssignmentId && jobExecution.jobAssignmentId !== notification.source) {
-            requestContext.response.statusCode = HttpStatusCode.BadRequest;
-            requestContext.response.statusMessage = "Unexpected notification from '" + notification.source + "'.";
+            requestContext.setResponseError(HttpStatusCode.BadRequest, "Unexpected notification from '" + notification.source + "'.");
             return;
         }
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await this.workerInvoker.invoke(WorkerFunctionId, {
+        await this.workerInvoker.invoke(getWorkerFunctionId(), {
             operationName: "ProcessNotification",
             input: {
                 jobId: job.id,

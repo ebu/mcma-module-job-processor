@@ -2,13 +2,13 @@ import { v4 as uuidv4 } from "uuid";
 import { DynamoDB } from "aws-sdk";
 
 import { Job, JobExecution, Logger } from "@mcma/core";
-import { DocumentDatabaseMutex, DocumentDatabaseTable, QueryResults } from "@mcma/data";
+import { DocumentDatabaseMutex, DocumentDatabaseTable, QueryResults, QuerySortOrder } from "@mcma/data";
 import { createJobResourceQuery, JobResourceQueryParameters } from "./custom-queries";
 import { DynamoDbTableOptions, DynamoDbTableProvider } from "@mcma/aws-dynamodb";
 
 function extractPath(id: string): string {
     const startIdx = id.indexOf("/jobs/");
-    return id.substr(startIdx);
+    return id.substring(startIdx);
 }
 
 function getDynamoDbOptions(consistentRead: boolean): DynamoDbTableOptions {
@@ -37,6 +37,10 @@ export class DataController {
         if (!this.dbTable) {
             this.dbTable = await this.dbTableProvider.get(this.tableName);
         }
+    }
+
+    async getDbTable(): Promise<DocumentDatabaseTable> {
+        await this.init();
         return this.dbTable;
     }
 
@@ -97,7 +101,7 @@ export class DataController {
         const jobPath = extractPath(jobId);
         const jobExecutionsPath = jobPath + "/executions";
 
-        return await this.dbTable.query({ path: jobExecutionsPath, sortAscending: false });
+        return await this.dbTable.query({ path: jobExecutionsPath, sortOrder: QuerySortOrder.Descending });
     }
 
     async getExecution(jobExecutionId: string): Promise<JobExecution> {

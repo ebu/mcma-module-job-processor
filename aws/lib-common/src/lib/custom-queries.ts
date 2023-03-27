@@ -1,21 +1,20 @@
 ﻿import { JobStatus } from "@mcma/core";
 import { QueryInput } from "aws-sdk/clients/dynamodb";
-import { CustomQuery, Document } from "@mcma/data";
+import { CustomQuery, Document, QuerySortOrder } from "@mcma/data";
 
 export type JobResourceQueryParameters = {
     partitionKey?: string;
     status?: JobStatus;
     from?: Date;
     to?: Date;
-    ascending?: boolean;
-    limit?: number;
+    sortOrder?: QuerySortOrder;
+    pageSize?: number;
 }
 
 export function createJobResourceQuery(customQuery: CustomQuery<Document, JobResourceQueryParameters>): QueryInput {
-    let { partitionKey, status, from, to, ascending, limit } = customQuery.parameters;
-    ascending = !!ascending;
-    if (limit === null) {
-        limit = undefined;
+    let { partitionKey, status, from, to, sortOrder, pageSize } = customQuery.parameters;
+    if (pageSize === null) {
+        pageSize = undefined;
     }
 
     const index = status ? "ResourceStatusIndex" : "ResourceCreatedIndex";
@@ -44,7 +43,7 @@ export function createJobResourceQuery(customQuery: CustomQuery<Document, JobRes
         IndexName: index,
         KeyConditionExpression: keyConditionExpression,
         ExpressionAttributeValues: expressionAttributeValues,
-        ScanIndexForward: ascending,
-        Limit: limit
+        ScanIndexForward: sortOrder === QuerySortOrder.Ascending,
+        Limit: pageSize
     };
 }

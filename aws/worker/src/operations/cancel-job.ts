@@ -45,7 +45,7 @@ export async function cancelExecution(job: Job, dataController: DataController, 
                 await client.post(undefined, `${jobExecution.jobAssignmentId}/cancel`);
             } catch (error) {
                 logger.warn(`Canceling job assignment '${jobExecution.jobAssignmentId}' failed`);
-                logger.warn(error?.toString());
+                logger.warn(error);
             }
         }
 

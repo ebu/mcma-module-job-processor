@@ -1,32 +1,41 @@
 import { JobStatus } from "@mcma/core";
 import { JobResourceQueryParameters } from "@local/job-processor";
+import { QuerySortOrder } from "@mcma/data";
 
-export function buildQueryParameters(queryStringParameters: { [key: string]: any }, fallbackLimit?: number): JobResourceQueryParameters {
-    const status = <JobStatus>queryStringParameters.status;
+export function buildQueryParameters(queryParams: { [key: string]: any }, defaultPageSize?: number): JobResourceQueryParameters {
+    const status = <JobStatus>queryParams.status;
 
-    let from = new Date(queryStringParameters.from);
+    let from = new Date(queryParams.from);
     if (isNaN(from.getTime())) {
         from = undefined;
     }
 
-    let to = new Date(queryStringParameters.to);
+    let to = new Date(queryParams.to);
     if (isNaN(to.getTime())) {
         to = undefined;
     }
 
-    let ascending = queryStringParameters.order === "asc";
-
-    let limit = Number.parseInt(queryStringParameters.limit);
-    if (isNaN(limit) || limit <= 0) {
-        limit = undefined;
+    let sortOrder: QuerySortOrder = QuerySortOrder.Ascending;
+    if (queryParams.sortOrder) {
+        sortOrder = queryParams.sortOrder.toLowerCase() === QuerySortOrder.Descending ? QuerySortOrder.Descending : QuerySortOrder.Ascending;
+        delete queryParams.sortOrder;
     }
 
-    if (fallbackLimit) {
+    let pageSize;
+    if (queryParams.pageSize) {
+        pageSize = parseInt(queryParams.pageSize);
+        if (isNaN(pageSize)) {
+            pageSize = undefined;
+        }
+        delete queryParams.pageSize;
+    }
+
+    if (defaultPageSize) {
         // setting limit to default value of 100 if no other limitation is set
         if ((from === undefined || from === null) &&
             (to === undefined || to === null) &&
-            (limit === undefined || limit === null)) {
-            limit = fallbackLimit;
+            (pageSize === undefined || pageSize === null)) {
+            pageSize = defaultPageSize;
         }
     }
 
@@ -34,7 +43,7 @@ export function buildQueryParameters(queryStringParameters: { [key: string]: any
         status,
         from,
         to,
-        ascending,
-        limit
+        sortOrder,
+        pageSize
     };
 }
