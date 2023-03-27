@@ -8,7 +8,7 @@ import { DynamoDbTableOptions, DynamoDbTableProvider } from "@mcma/aws-dynamodb"
 
 function extractPath(id: string): string {
     const startIdx = id.indexOf("/jobs/");
-    return id.substr(startIdx);
+    return id.substring(startIdx);
 }
 
 function getDynamoDbOptions(consistentRead: boolean): DynamoDbTableOptions {
@@ -37,6 +37,10 @@ export class DataController {
         if (!this.dbTable) {
             this.dbTable = await this.dbTableProvider.get(this.tableName);
         }
+    }
+
+    async getDbTable(): Promise<DocumentDatabaseTable> {
+        await this.init();
         return this.dbTable;
     }
 

@@ -52,7 +52,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
             await deleteJob(job);
         }
     } catch (error) {
-        logger.error(error?.toString());
+        logger.error(error);
         throw error;
     } finally {
         logger.functionEnd(context.awsRequestId);

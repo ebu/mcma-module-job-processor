@@ -8,7 +8,7 @@ import { getPublicUrl } from "@mcma/api";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 
-import { DataController } from "@local/job-processor";
+import { DataController, disableEventRule, enableEventRule } from "@local/job-processor";
 import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
 const { CLOUD_WATCH_EVENT_RULE, DEFAULT_JOB_TIMEOUT_IN_MINUTES } = process.env;
@@ -29,7 +29,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
     const logger = loggerProvider.get(context.awsRequestId, tracker);
     try {
-        await cloudWatchEvents.disableRule({ Name: CLOUD_WATCH_EVENT_RULE }).promise();
+        await disableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEvents, context.awsRequestId, logger);
 
         const newJobs = await dataController.queryJobs({ status: JobStatus.New });
         const pendingJobs = await dataController.queryJobs({ status: JobStatus.Pending });
@@ -40,11 +40,11 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
         const jobs =
             newJobs.results
-                   .concat(pendingJobs.results)
-                   .concat(assignedJobs.results)
-                   .concat(queuedJobs.results)
-                   .concat(scheduledJobs.results)
-                   .concat(runningJobs.results);
+                .concat(pendingJobs.results)
+                .concat(assignedJobs.results)
+                .concat(queuedJobs.results)
+                .concat(scheduledJobs.results)
+                .concat(runningJobs.results);
 
         logger.info(`Found ${jobs.length} active jobs`);
 
@@ -101,10 +101,10 @@ export async function handler(event: ScheduledEvent, context: Context) {
 
         if (activeJobs) {
             logger.info(`There are ${activeJobs} active jobs remaining`);
-            await cloudWatchEvents.enableRule({ Name: CLOUD_WATCH_EVENT_RULE }).promise();
+            await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEvents, context.awsRequestId, logger);
         }
     } catch (error) {
-        logger.error(error?.toString());
+        logger.error(error);
         throw error;
     } finally {
         logger.functionEnd(context.awsRequestId);

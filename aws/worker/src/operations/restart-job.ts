@@ -26,7 +26,7 @@ export async function restartJob(providers: ProviderCollection, workerRequest: W
 
         job = await cancelExecution(job, dataController, resourceManager, providers.authProvider, logger);
 
-        job = await startExecution(job, dataController, resourceManager, providers.authProvider, logger, context.cloudWatchEvents);
+        job = await startExecution(job, resourceManager, providers.authProvider, logger, context);
     } finally {
         await mutex.unlock();
     }

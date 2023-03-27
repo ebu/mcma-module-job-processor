@@ -28,7 +28,7 @@ export async function deleteJob(providers: ProviderCollection, workerRequest: Wo
                     await resourceManager.delete(jobExecution.jobAssignmentId);
                 } catch (error) {
                     logger.warn(`Failed to delete job assignment ${jobExecution.jobAssignmentId}`);
-                    logger.warn(error?.toString());
+                    logger.warn(error);
                 }
             }
             await dataController.deleteExecution(jobExecution.id);
