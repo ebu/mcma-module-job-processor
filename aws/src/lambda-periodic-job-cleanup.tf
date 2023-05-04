@@ -3,11 +3,11 @@
 #################################
 
 locals {
-  lambda_name_periodic_job_cleanup = format("%.64s", replace("${var.prefix}-periodic-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
+  lambda_name_periodic_job_cleanup = format("%.64s", replace("${var.prefix}-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
 }
 
 resource "aws_iam_role" "periodic_job_cleanup" {
-  name = format("%.64s", replace("${var.prefix}-${var.aws_region}-periodic-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
+  name = format("%.64s", replace("${var.prefix}-${var.aws_region}-job-cleanup", "/[^a-zA-Z0-9_]+/", "-" ))
   path = var.iam_role_path
 
   assume_role_policy = jsonencode({
@@ -18,11 +18,13 @@ resource "aws_iam_role" "periodic_job_cleanup" {
         Effect    = "Allow"
         Action    = "sts:AssumeRole"
         Principal = {
-          "Service" = "lambda.amazonaws.com"
+          Service = "lambda.amazonaws.com"
         }
       }
     ]
   })
+
+  permissions_boundary = var.iam_permissions_boundary
 
   tags = var.tags
 }
@@ -41,24 +43,24 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
         Resource = "*"
       },
       {
-        Sid      = "WriteToCloudWatchLogs"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "WriteToCloudWatchLogs"
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ],
         Resource = concat([
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:${var.log_group.name}:*",
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_periodic_job_cleanup}:*",
+          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${var.log_group.name}:*",
+          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.lambda_name_periodic_job_cleanup}:*",
         ], var.enhanced_monitoring_enabled ? [
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda-insights:*",
+          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda-insights:*",
         ] : [])
       },
       {
-        Sid      = "ListAndDescribeDynamoDBTables"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "ListAndDescribeDynamoDBTables"
+        Effect = "Allow"
+        Action = [
           "dynamodb:List*",
           "dynamodb:DescribeReservedCapacity*",
           "dynamodb:DescribeLimits",
@@ -67,9 +69,9 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
         Resource = "*"
       },
       {
-        Sid      = "AllowTableOperations"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "AllowTableOperations"
+        Effect = "Allow"
+        Action = [
           "dynamodb:BatchGetItem",
           "dynamodb:BatchWriteItem",
           "dynamodb:DeleteItem",
@@ -89,29 +91,29 @@ resource "aws_iam_role_policy" "periodic_job_cleanup" {
         Sid      = "AllowInvokingWorkerLambda"
         Effect   = "Allow"
         Action   = "lambda:InvokeFunction"
-        Resource = "arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${local.lambda_name_worker}"
+        Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.lambda_name_worker}"
       },
     ],
-    var.xray_tracing_enabled ?
-    [
-      {
-        Sid      = "AllowLambdaWritingToXRay"
-        Effect   = "Allow"
-        Action   = [
-          "xray:PutTraceSegments",
-          "xray:PutTelemetryRecords",
-        ]
-        Resource = "*"
-      }
-    ] : [],
-    var.dead_letter_config_target != null ?
-    [
-      {
-        Effect   = "Allow"
-        Action   = "sqs:SendMessage"
-        Resource = var.dead_letter_config_target
-      }
-    ] : [])
+      var.xray_tracing_enabled ?
+      [
+        {
+          Sid    = "AllowLambdaWritingToXRay"
+          Effect = "Allow"
+          Action = [
+            "xray:PutTraceSegments",
+            "xray:PutTelemetryRecords",
+          ]
+          Resource = "*"
+        }
+      ] : [],
+      var.dead_letter_config_target != null ?
+      [
+        {
+          Effect   = "Allow"
+          Action   = "sqs:SendMessage"
+          Resource = var.dead_letter_config_target
+        }
+      ] : [])
   })
 }
 
@@ -126,21 +128,23 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
   role             = aws_iam_role.periodic_job_cleanup.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/functions/periodic-job-cleanup.zip")
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   timeout          = "900"
   memory_size      = "2048"
 
-  layers = var.enhanced_monitoring_enabled ? ["arn:aws:lambda:${var.aws_region}:580247275435:layer:LambdaInsightsExtension:14"] : []
+  layers = var.enhanced_monitoring_enabled && contains(keys(local.lambda_insights_extensions), var.aws_region) ? [
+    local.lambda_insights_extensions[var.aws_region]
+  ] : []
 
   environment {
     variables = {
-      LogGroupName             = var.log_group.name
-      TableName                = aws_dynamodb_table.service_table.name
-      PublicUrl                = local.service_url
-      ServicesUrl              = var.service_registry.services_url
-      ServicesAuthType         = var.service_registry.auth_type
-      JobRetentionPeriodInDays = var.job_retention_period_in_days
-      WorkerFunctionId         = local.lambda_name_worker
+      MCMA_LOG_GROUP_NAME             = var.log_group.name
+      MCMA_TABLE_NAME                 = aws_dynamodb_table.service_table.name
+      MCMA_PUBLIC_URL                 = local.service_url
+      MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
+      MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
+      MCMA_WORKER_FUNCTION_ID         = local.lambda_name_worker
+      JOB_RETENTION_PERIOD_IN_DAYS    = var.job_retention_period_in_days
     }
   }
 

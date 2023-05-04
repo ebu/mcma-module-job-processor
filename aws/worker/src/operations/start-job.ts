@@ -3,11 +3,11 @@ import { Job, JobAssignment, JobExecution, JobParameterBag, JobProfile, JobStatu
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 import { AuthProvider, ResourceManager, ServiceClient } from "@mcma/client";
 
-import { DataController } from "@local/job-processor";
+import { DataController, enableEventRule } from "@local/job-processor";
 
 import { logJobEvent } from "../utils";
 
-const { CloudWatchEventRule } = process.env;
+const { CLOUD_WATCH_EVENT_RULE } = process.env;
 
 export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }) {
     const jobId = workerRequest.input.jobId;
@@ -27,7 +27,7 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
             throw new McmaException(`Job with id '${jobId}' not found`);
         }
 
-        job = await startExecution(job, dataController, resourceManager, providers.authProvider, logger, context.cloudWatchEvents);
+        job = await startExecution(job, resourceManager, providers.authProvider, logger, context);
     } finally {
         await mutex.unlock();
     }
@@ -35,11 +35,13 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
     await resourceManager.sendNotification(job);
 }
 
-export async function startExecution(job: Job, dataController: DataController, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger, cloudWatchEvents: CloudWatchEvents): Promise<Job> {
+export async function startExecution(job: Job, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }): Promise<Job> {
     logger.info("Creating Job Execution");
     let jobExecution = new JobExecution({
         status: JobStatus.Pending
     });
+
+    const dataController = context.dataController;
 
     jobExecution = await dataController.addExecution(job.id, jobExecution);
 
@@ -154,7 +156,7 @@ export async function startExecution(job: Job, dataController: DataController, r
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
 
-        await cloudWatchEvents.enableRule({ Name: CloudWatchEventRule }).promise();
+        await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), context.cloudWatchEvents, context.awsRequestId, logger);
     } catch (error) {
         jobExecution.status = JobStatus.Failed;
         jobExecution.error = new ProblemDetail({
@@ -166,7 +168,7 @@ export async function startExecution(job: Job, dataController: DataController, r
         await dataController.updateExecution(jobExecution);
 
         logger.error("Failed to start job due to error '" + error?.message + "'");
-        logger.error(error?.toString());
+        logger.error(error);
         job.status = jobExecution.status;
         job.error = jobExecution.error;
 

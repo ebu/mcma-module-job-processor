@@ -1,14 +1,14 @@
 ﻿import { v4 as uuidv4 } from "uuid";
 
-import { HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection, } from "@mcma/api";
+import { getPublicUrl, HttpStatusCode, McmaApiRequestContext, McmaApiRouteCollection, } from "@mcma/api";
 import { Job, JobProfile, JobStatus, McmaTracker } from "@mcma/core";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 import { ResourceManagerProvider } from "@mcma/client";
+import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
 import { DataController } from "@local/job-processor";
-import { buildQueryParameters } from "./queries";
 
-const { PublicUrl, WorkerFunctionId } = process.env;
+import { buildQueryParameters } from "./queries";
 
 export class JobRoutes extends McmaApiRouteCollection {
     constructor(private dataController: DataController, private resourceManagerProvider: ResourceManagerProvider, private workerInvoker: LambdaWorkerInvoker) {
@@ -54,7 +54,7 @@ export class JobRoutes extends McmaApiRouteCollection {
 
         requestContext.setResponseBody(job);
 
-        await this.workerInvoker.invoke(WorkerFunctionId, {
+        await this.workerInvoker.invoke(getWorkerFunctionId(), {
             operationName: "StartJob",
             input: {
                 jobId: job.id
@@ -66,7 +66,7 @@ export class JobRoutes extends McmaApiRouteCollection {
     async getJob(requestContext: McmaApiRequestContext) {
         const { jobId } = requestContext.request.pathVariables;
 
-        const job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
+        const job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
 
         if (!job) {
             requestContext.setResponseResourceNotFound();
@@ -79,7 +79,7 @@ export class JobRoutes extends McmaApiRouteCollection {
     async deleteJob(requestContext: McmaApiRequestContext) {
         const { jobId } = requestContext.request.pathVariables;
 
-        const job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
+        const job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
 
         if (!job) {
             requestContext.setResponseResourceNotFound();
@@ -89,13 +89,13 @@ export class JobRoutes extends McmaApiRouteCollection {
         if (job.status !== JobStatus.Completed &&
             job.status !== JobStatus.Failed &&
             job.status !== JobStatus.Canceled) {
-            requestContext.setResponseStatusCode(HttpStatusCode.Conflict, `Cannot delete job while is non final state (${job.status})`);
+            requestContext.setResponseError(HttpStatusCode.Conflict, `Cannot delete job while is non final state (${job.status})`);
             return;
         }
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await this.workerInvoker.invoke(WorkerFunctionId, {
+        await this.workerInvoker.invoke(getWorkerFunctionId(), {
             operationName: "DeleteJob",
             input: {
                 jobId: job.id
@@ -107,7 +107,7 @@ export class JobRoutes extends McmaApiRouteCollection {
     async cancelJob(requestContext: McmaApiRequestContext) {
         const { jobId } = requestContext.request.pathVariables;
 
-        const job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
+        const job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
 
         if (!job) {
             requestContext.setResponseResourceNotFound();
@@ -117,13 +117,13 @@ export class JobRoutes extends McmaApiRouteCollection {
         if (job.status === JobStatus.Completed ||
             job.status === JobStatus.Failed ||
             job.status === JobStatus.Canceled) {
-            requestContext.setResponseStatusCode(HttpStatusCode.Conflict, `Cannot cancel job when already finished`);
+            requestContext.setResponseError(HttpStatusCode.Conflict, `Cannot cancel job when already finished`);
             return;
         }
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await this.workerInvoker.invoke(WorkerFunctionId, {
+        await this.workerInvoker.invoke(getWorkerFunctionId(), {
             operationName: "CancelJob",
             input: {
                 jobId: job.id
@@ -135,7 +135,7 @@ export class JobRoutes extends McmaApiRouteCollection {
     async restartJob(requestContext: McmaApiRequestContext) {
         const { jobId } = requestContext.request.pathVariables;
 
-        const job = await this.dataController.getJob(`${PublicUrl}/jobs/${jobId}`);
+        const job = await this.dataController.getJob(`${getPublicUrl()}/jobs/${jobId}`);
 
         if (!job) {
             requestContext.setResponseResourceNotFound();
@@ -143,13 +143,13 @@ export class JobRoutes extends McmaApiRouteCollection {
         }
 
         if (job.deadline && job.deadline < new Date()) {
-            requestContext.setResponseStatusCode(HttpStatusCode.Conflict, `Cannot restart job when deadline is in the past (${job.deadline.toISOString()})`);
+            requestContext.setResponseError(HttpStatusCode.Conflict, `Cannot restart job when deadline is in the past (${job.deadline.toISOString()})`);
             return;
         }
 
         requestContext.setResponseStatusCode(HttpStatusCode.Accepted);
 
-        await this.workerInvoker.invoke(WorkerFunctionId, {
+        await this.workerInvoker.invoke(getWorkerFunctionId(), {
             operationName: "RestartJob",
             input: {
                 jobId: job.id

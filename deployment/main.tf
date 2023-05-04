@@ -7,6 +7,15 @@ provider "aws" {
   region  = var.aws_region
 }
 
+provider "mcma" {
+  service_registry_url = module.service_registry_aws.service_url
+
+  aws4_auth {
+    profile = var.aws_profile
+    region  = var.aws_region
+  }
+}
+
 ############################################
 # Cloud watch log group for central logging
 ############################################
@@ -20,22 +29,19 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.13.28/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.15.0/module.zip"
 
   prefix = "${var.global_prefix}-service-registry"
 
-  aws_account_id = var.aws_account_id
+  stage_name = var.environment_type
+
   aws_region     = var.aws_region
-  stage_name     = var.environment_type
+  aws_profile    = var.aws_profile
 
   log_group                   = aws_cloudwatch_log_group.main
-  api_gateway_logging_enabled = true
   api_gateway_metrics_enabled = true
   xray_tracing_enabled        = true
-
-  services = [
-    module.job_processor_aws.service_definition
-  ]
+  enhanced_monitoring_enabled = true
 }
 
 #########################
@@ -50,7 +56,6 @@ module "job_processor_aws" {
   stage_name     = var.environment_type
   dashboard_name = var.global_prefix
 
-  aws_account_id = var.aws_account_id
   aws_region     = var.aws_region
 
   service_registry = module.service_registry_aws
@@ -59,7 +64,6 @@ module "job_processor_aws" {
   ]
 
   log_group                   = aws_cloudwatch_log_group.main
-  api_gateway_logging_enabled = true
   api_gateway_metrics_enabled = true
   xray_tracing_enabled        = true
 }
