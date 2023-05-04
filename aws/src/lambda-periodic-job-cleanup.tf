@@ -121,11 +121,11 @@ resource "aws_lambda_function" "periodic_job_cleanup" {
     aws_iam_role_policy.periodic_job_cleanup
   ]
 
-  filename         = "${path.module}/lambdas/periodic-job-cleanup.zip"
+  filename         = "${path.module}/functions/periodic-job-cleanup.zip"
   function_name    = local.lambda_name_periodic_job_cleanup
   role             = aws_iam_role.periodic_job_cleanup.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/periodic-job-cleanup.zip")
+  source_code_hash = filebase64sha256("${path.module}/functions/periodic-job-cleanup.zip")
   runtime          = "nodejs14.x"
   timeout          = "900"
   memory_size      = "2048"

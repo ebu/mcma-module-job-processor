@@ -122,11 +122,11 @@ resource "aws_lambda_function" "api_handler" {
     aws_iam_role_policy.api_handler
   ]
 
-  filename         = "${path.module}/lambdas/api-handler.zip"
+  filename         = "${path.module}/functions/api-handler.zip"
   function_name    = local.lambda_name_api_handler
   role             = aws_iam_role.api_handler.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/api-handler.zip")
+  source_code_hash = filebase64sha256("${path.module}/functions/api-handler.zip")
   runtime          = "nodejs14.x"
   timeout          = "30"
   memory_size      = "2048"

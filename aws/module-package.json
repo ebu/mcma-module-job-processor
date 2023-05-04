@@ -1,0 +1,30 @@
+{
+  "files": [
+    {
+      "src": "src/*.*",
+      "flatten": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "api-handler",
+      "type": "AwsLambdaFunction",
+      "path": "api-handler"
+    },
+    {
+      "name": "worker",
+      "type": "AwsLambdaFunction",
+      "path": "worker"
+    },
+    {
+      "name": "periodic-job-checker",
+      "type": "AwsLambdaFunction",
+      "path": "periodic-job-checker"
+    },
+    {
+      "name": "periodic-job-cleanup",
+      "type": "AwsLambdaFunction",
+      "path": "periodic-job-cleanup"
+    }
+  ]
+}

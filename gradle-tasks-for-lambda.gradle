@@ -13,7 +13,7 @@ task copyNodeModules(type: Copy) {
 task build(type: Zip) {
     dependsOn copyNodeModules, tsc
     from "build/staging"
-    archiveFileName = "lambda.zip"
+    archiveFileName = "function.zip"
     destinationDirectory = file("build/dist")
     preserveFileTimestamps = false
     reproducibleFileOrder = true

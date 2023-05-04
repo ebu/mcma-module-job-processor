@@ -1,0 +1,7 @@
+{
+  "namespace": "ebu",
+  "name": "job-processor",
+  "displayName": "Job Processor",
+  "description": "The Job Processor is used for submitting and monitoring jobs",
+  "version": "0.3.2"
+}

@@ -2,28 +2,28 @@ apply from: "${project.rootDir}/gradle-tasks-for-module.gradle"
 
 task copyApiHandler(type: Copy) {
     dependsOn "api-handler:build"
-    from file("api-handler/build/dist/lambda.zip")
+    from file("api-handler/build/dist/function.zip")
     into "build/staging/lambdas"
     rename { "api-handler.zip" }
 }
 
 task copyPeriodicJobChecker(type: Copy) {
     dependsOn "periodic-job-checker:build"
-    from file("periodic-job-checker/build/dist/lambda.zip")
+    from file("periodic-job-checker/build/dist/function.zip")
     into "build/staging/lambdas"
     rename { "periodic-job-checker.zip" }
 }
 
 task copyPeriodicJobCleanup(type: Copy) {
     dependsOn "periodic-job-cleanup:build"
-    from file("periodic-job-cleanup/build/dist/lambda.zip")
+    from file("periodic-job-cleanup/build/dist/function.zip")
     into "build/staging/lambdas"
     rename { "periodic-job-cleanup.zip" }
 }
 
 task copyWorker(type: Copy) {
     dependsOn "worker:build"
-    from file("worker/build/dist/lambda.zip")
+    from file("worker/build/dist/function.zip")
     into "build/staging/lambdas"
     rename { "worker.zip" }
 }

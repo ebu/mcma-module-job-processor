@@ -108,11 +108,11 @@ resource "aws_lambda_function" "periodic_job_checker" {
     aws_iam_role_policy.periodic_job_checker
   ]
 
-  filename         = "${path.module}/lambdas/periodic-job-checker.zip"
+  filename         = "${path.module}/functions/periodic-job-checker.zip"
   function_name    = local.lambda_name_periodic_job_checker
   role             = aws_iam_role.periodic_job_checker.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/periodic-job-checker.zip")
+  source_code_hash = filebase64sha256("${path.module}/functions/periodic-job-checker.zip")
   runtime          = "nodejs14.x"
   timeout          = "900"
   memory_size      = "2048"

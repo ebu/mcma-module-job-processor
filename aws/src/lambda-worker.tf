@@ -130,11 +130,11 @@ resource "aws_lambda_function" "worker" {
     aws_iam_role_policy.worker
   ]
 
-  filename         = "${path.module}/lambdas/worker.zip"
+  filename         = "${path.module}/functions/worker.zip"
   function_name    = local.lambda_name_worker
   role             = aws_iam_role.worker.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/worker.zip")
+  source_code_hash = filebase64sha256("${path.module}/functions/worker.zip")
   runtime          = "nodejs14.x"
   timeout          = "900"
   memory_size      = "2048"
