@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { DynamoDB } from "aws-sdk";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import { Job, JobExecution, Logger } from "@mcma/core";
 import { DocumentDatabaseMutex, DocumentDatabaseTable, QueryResults, QuerySortOrder } from "@mcma/data";
@@ -29,8 +29,8 @@ export class DataController {
     private dbTableProvider: DynamoDbTableProvider;
     private dbTable: DocumentDatabaseTable;
 
-    constructor(private tableName: string, private publicUrl: string, consistentRead: boolean, dynamoDB: DynamoDB) {
-        this.dbTableProvider = new DynamoDbTableProvider(getDynamoDbOptions(consistentRead), dynamoDB);
+    constructor(private tableName: string, private publicUrl: string, consistentRead: boolean, dynamoDBClient: DynamoDBClient) {
+        this.dbTableProvider = new DynamoDbTableProvider(getDynamoDbOptions(consistentRead), dynamoDBClient);
     }
 
     private async init() {

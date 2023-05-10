@@ -1,8 +1,8 @@
-import { CloudWatchEvents } from "aws-sdk";
+import { CloudWatchEventsClient, DescribeRuleCommand, DisableRuleCommand, EnableRuleCommand } from "@aws-sdk/client-cloudwatch-events";
 import { DocumentDatabaseTable } from "@mcma/data";
 import { Logger, Utils } from "@mcma/core";
 
-async function enableDisableRule(doEnable: boolean, ruleName: string, table: DocumentDatabaseTable, cloudWatchEvents: CloudWatchEvents, requestId: string, logger: Logger) {
+async function enableDisableRule(doEnable: boolean, ruleName: string, table: DocumentDatabaseTable, cloudWatchEventsClient: CloudWatchEventsClient, requestId: string, logger: Logger) {
     const mutex = table.createMutex({
         name: ruleName,
         holder: requestId,
@@ -11,15 +11,15 @@ async function enableDisableRule(doEnable: boolean, ruleName: string, table: Doc
 
     await mutex.lock();
     try {
-        let rule = await cloudWatchEvents.describeRule({ Name: ruleName }).promise();
+        let rule = await cloudWatchEventsClient.send(new DescribeRuleCommand({ Name: ruleName }));
         if (rule.State !== "DISABLED") {
-            await cloudWatchEvents.disableRule({ Name: ruleName }).promise();
+            await cloudWatchEventsClient.send(new DisableRuleCommand({ Name: ruleName }));
             await Utils.sleep(2500);
-            rule = await cloudWatchEvents.describeRule({ Name: ruleName }).promise();
+            rule = await cloudWatchEventsClient.send(new DescribeRuleCommand({ Name: ruleName }));
         }
         if (doEnable) {
             if (rule.State !== "ENABLED") {
-                await cloudWatchEvents.enableRule({ Name: ruleName }).promise();
+                await cloudWatchEventsClient.send(new EnableRuleCommand({ Name: ruleName }));
                 await Utils.sleep(2500);
             }
         }
@@ -28,10 +28,10 @@ async function enableDisableRule(doEnable: boolean, ruleName: string, table: Doc
     }
 }
 
-export async function enableEventRule(ruleName: string, table: DocumentDatabaseTable, cloudWatchEvents: CloudWatchEvents, requestId: string, logger: Logger) {
-    await enableDisableRule(true, ruleName, table, cloudWatchEvents, requestId, logger);
+export async function enableEventRule(ruleName: string, table: DocumentDatabaseTable, cloudWatchEventsClient: CloudWatchEventsClient, requestId: string, logger: Logger) {
+    await enableDisableRule(true, ruleName, table, cloudWatchEventsClient, requestId, logger);
 }
 
-export async function disableEventRule(ruleName: string, table: DocumentDatabaseTable, cloudWatchEvents: CloudWatchEvents, requestId: string, logger: Logger) {
-    await enableDisableRule(false, ruleName, table, cloudWatchEvents, requestId, logger);
+export async function disableEventRule(ruleName: string, table: DocumentDatabaseTable, cloudWatchEventsClient: CloudWatchEventsClient, requestId: string, logger: Logger) {
+    await enableDisableRule(false, ruleName, table, cloudWatchEventsClient, requestId, logger);
 }

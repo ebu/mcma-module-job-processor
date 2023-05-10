@@ -1,12 +1,13 @@
+import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
+
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
 import { Job, McmaException } from "@mcma/core";
 import { startExecution } from "./start-job";
 import { cancelExecution } from "./cancel-job";
-import { CloudWatchEvents } from "aws-sdk";
 
-export async function restartJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }) {
+export async function restartJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEventsClient: CloudWatchEventsClient }) {
     const jobId = workerRequest.input.jobId;
 
     const logger = workerRequest.logger;

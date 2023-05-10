@@ -1,5 +1,7 @@
 import { APIGatewayProxyEventV2, Context } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { LambdaClient } from "@aws-sdk/client-lambda";
 
 import { ConsoleLoggerProvider } from "@mcma/core";
 import { getPublicUrl, McmaApiRouteCollection } from "@mcma/api";
@@ -13,15 +15,16 @@ import { DataController } from "@local/job-processor";
 import { JobRoutes } from "./job-routes";
 import { JobExecutionRoutes } from "./job-execution-routes";
 
-const AWS = AWSXRay.captureAWS(require("aws-sdk"));
+const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
+const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
 
-const authProvider = new AuthProvider().add(awsV4Auth(AWS));
+const authProvider = new AuthProvider().add(awsV4Auth());
 const resourceManagerProvider = new ResourceManagerProvider(authProvider);
 
 const loggerProvider = new ConsoleLoggerProvider("job-processor-api-handler");
-const workerInvoker = new LambdaWorkerInvoker(new AWS.Lambda());
+const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), false, new AWS.DynamoDB());
+const dataController = new DataController(getTableName(), getPublicUrl(), false, dynamoDBClient);
 const jobRoutes = new JobRoutes(dataController, resourceManagerProvider, workerInvoker);
 const jobExecutionRoutes = new JobExecutionRoutes(dataController, workerInvoker);
 

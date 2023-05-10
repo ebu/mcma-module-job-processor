@@ -1,7 +1,7 @@
+import { Job, JobStatus, McmaException } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
-import { Job, JobStatus, McmaException } from "@mcma/core";
 import { logJobEvent } from "../utils";
 
 export async function failJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {

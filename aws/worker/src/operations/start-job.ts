@@ -1,4 +1,5 @@
-import { CloudWatchEvents } from "aws-sdk";
+import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
+
 import { Job, JobAssignment, JobExecution, JobParameterBag, JobProfile, JobStatus, Logger, McmaException, NotificationEndpoint, ProblemDetail, Service } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 import { AuthProvider, ResourceManager, ServiceClient } from "@mcma/client";
@@ -9,7 +10,7 @@ import { logJobEvent } from "../utils";
 
 const { CLOUD_WATCH_EVENT_RULE } = process.env;
 
-export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }) {
+export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController, cloudWatchEventsClient: CloudWatchEventsClient }) {
     const jobId = workerRequest.input.jobId;
 
     const logger = workerRequest.logger;
@@ -35,7 +36,7 @@ export async function startJob(providers: ProviderCollection, workerRequest: Wor
     await resourceManager.sendNotification(job);
 }
 
-export async function startExecution(job: Job, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger, context: { awsRequestId: string, dataController: DataController, cloudWatchEvents: CloudWatchEvents }): Promise<Job> {
+export async function startExecution(job: Job, resourceManager: ResourceManager, authProvider: AuthProvider, logger: Logger, context: { awsRequestId: string, dataController: DataController, cloudWatchEventsClient: CloudWatchEventsClient }): Promise<Job> {
     logger.info("Creating Job Execution");
     let jobExecution = new JobExecution({
         status: JobStatus.Pending
@@ -156,7 +157,7 @@ export async function startExecution(job: Job, resourceManager: ResourceManager,
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
 
-        await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), context.cloudWatchEvents, context.awsRequestId, logger);
+        await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), context.cloudWatchEventsClient, context.awsRequestId, logger);
     } catch (error) {
         jobExecution.status = JobStatus.Failed;
         jobExecution.error = new ProblemDetail({

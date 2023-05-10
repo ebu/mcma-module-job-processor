@@ -1,9 +1,9 @@
+import { Job, JobStatus, Logger, McmaException } from "@mcma/core";
+import { AuthProvider, ResourceManager } from "@mcma/client";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
-import { Job, JobStatus, Logger, McmaException } from "@mcma/core";
 import { logJobEvent } from "../utils";
-import { AuthProvider, ResourceManager } from "@mcma/client";
 
 export async function cancelJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {
     const jobId = workerRequest.input.jobId;

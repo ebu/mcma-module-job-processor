@@ -1,5 +1,5 @@
-import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 import { Job, JobExecution, JobStatus, McmaException } from "@mcma/core";
+import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
 

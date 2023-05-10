@@ -1,7 +1,7 @@
+import { McmaException } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/job-processor";
-import { McmaException } from "@mcma/core";
 
 export async function deleteJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: { awsRequestId: string, dataController: DataController }) {
     const jobId = workerRequest.input.jobId;

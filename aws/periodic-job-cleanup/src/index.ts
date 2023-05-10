@@ -1,5 +1,8 @@
 import { Context, ScheduledEvent } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
+import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { LambdaClient } from "@aws-sdk/client-lambda";
 import { v4 as uuidv4 } from "uuid";
 
 import { Job, JobStatus, McmaTracker } from "@mcma/core";
@@ -13,12 +16,14 @@ import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
 const { JOB_RETENTION_PERIOD_IN_DAYS } = process.env;
 
-const AWS = AWSXRay.captureAWS(require("aws-sdk"));
+const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
+const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
+const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
 
-const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-cleanup", getLogGroupName(), new AWS.CloudWatchLogs());
-const workerInvoker = new LambdaWorkerInvoker(new AWS.Lambda());
+const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-cleanup", getLogGroupName(), cloudWatchLogsClient);
+const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), false, new AWS.DynamoDB());
+const dataController = new DataController(getTableName(), getPublicUrl(), false, dynamoDBClient);
 
 export async function handler(event: ScheduledEvent, context: Context) {
     const tracker = new McmaTracker({

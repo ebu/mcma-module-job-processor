@@ -1,5 +1,8 @@
 import { Context } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
+import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
+import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
 import { ProviderCollection, Worker, WorkerRequest, WorkerRequestProperties } from "@mcma/worker";
@@ -12,14 +15,15 @@ import { DataController } from "@local/job-processor";
 
 import { cancelJob, deleteJob, failJob, processNotification, restartJob, startJob } from "./operations";
 
-const AWS = AWSXRay.captureAWS(require("aws-sdk"));
+const cloudWatchEventsClient = AWSXRay.captureAWSv3Client(new CloudWatchEventsClient({}));
+const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
+const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
 
-const authProvider = new AuthProvider().add(awsV4Auth(AWS));
+const authProvider = new AuthProvider().add(awsV4Auth());
 const resourceManagerProvider = new ResourceManagerProvider(authProvider);
-const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-worker", getLogGroupName(), new AWS.CloudWatchLogs());
+const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-worker", getLogGroupName(), cloudWatchLogsClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), true, new AWS.DynamoDB());
-const cloudWatchEvents = new AWS.CloudWatchEvents();
+const dataController = new DataController(getTableName(), getPublicUrl(), true, dynamoDBClient);
 
 const providerCollection = new ProviderCollection({
     authProvider,
@@ -47,7 +51,7 @@ export async function handler(event: WorkerRequestProperties, context: Context) 
         await worker.doWork(new WorkerRequest(event, logger), {
             awsRequestId: context.awsRequestId,
             dataController,
-            cloudWatchEvents
+            cloudWatchEventsClient
         });
     } catch (error) {
         logger.error("Error occurred when handling operation '" + event.operationName + "'");

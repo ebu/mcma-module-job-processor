@@ -1,6 +1,6 @@
 ﻿import { JobStatus } from "@mcma/core";
-import { QueryInput } from "aws-sdk/clients/dynamodb";
 import { CustomQuery, Document, QuerySortOrder } from "@mcma/data";
+import { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 
 export type JobResourceQueryParameters = {
     partitionKey?: string;
@@ -11,7 +11,7 @@ export type JobResourceQueryParameters = {
     pageSize?: number;
 }
 
-export function createJobResourceQuery(customQuery: CustomQuery<Document, JobResourceQueryParameters>): QueryInput {
+export function createJobResourceQuery(customQuery: CustomQuery<Document, JobResourceQueryParameters>): QueryCommandInput {
     let { partitionKey, status, from, to, sortOrder, pageSize } = customQuery.parameters;
     if (pageSize === null) {
         pageSize = undefined;
