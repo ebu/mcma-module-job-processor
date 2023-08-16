@@ -77,7 +77,8 @@
                 "view": "singleValue",
                 "region": "${aws_region}",
                 "stat": "Sum",
-                "period": 2592000,
+                "period": 60,
+                "setPeriodToTimeRange": true,
                 "title": "MCMA Job Statistics"
             }
         },
@@ -89,7 +90,7 @@
             "height": 3,
             "properties": {
                 "metrics": [
-                    [ { "expression": "100*(m2/(m1+m2+m3))", "label": "Failure rate %", "id": "e1", "stat": "Sum", "period": 2592000, "region": "${aws_region}" } ],
+                    [ { "expression": "100*(m2/(m1+m2+m3))", "label": "Failure rate %", "id": "e1" } ],
                     [ "${namespace}", "JobsCompleted", { "id": "m1", "visible": false } ],
                     [ ".", "JobsFailed", { "id": "m2", "visible": false } ],
                     [ ".", "JobsCanceled", { "id": "m3", "visible": false } ]
@@ -97,7 +98,8 @@
                 "view": "singleValue",
                 "region": "${aws_region}",
                 "stat": "Sum",
-                "period": 2592000
+                "period": 60,
+                "setPeriodToTimeRange": true
             }
         },
         {
@@ -122,7 +124,7 @@
             "height": 3,
             "properties": {
                 "metrics": [
-                    [ { "expression": "100*(m1/(m1+m2+m3))", "label": "Success rate %", "id": "e1", "stat": "Sum", "period": 2592000, "region": "${aws_region}" } ],
+                    [ { "expression": "100*(m1/(m1+m2+m3))", "label": "Success rate %", "id": "e1" } ],
                     [ "${namespace}", "JobsCompleted", { "id": "m1", "visible": false } ],
                     [ ".", "JobsFailed", { "id": "m2", "visible": false } ],
                     [ ".", "JobsCanceled", { "id": "m3", "visible": false } ]
@@ -130,7 +132,8 @@
                 "view": "singleValue",
                 "region": "${aws_region}",
                 "stat": "Sum",
-                "period": 2592000
+                "period": 60,
+                "setPeriodToTimeRange": true
             }
         }
     ]

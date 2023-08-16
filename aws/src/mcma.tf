@@ -14,7 +14,7 @@ resource "mcma_service" "service" {
   ]
 
   name      = var.name
-  auth_type = local.service_auth_type
+  auth_type = var.api_security_auth_type
 
   dynamic "resource" {
     for_each = concat(["AmeJob", "AIJob", "CaptureJob", "DistributionJob", "QAJob", "TransferJob", "TransformJob", "WorkflowJob"], var.custom_job_types)

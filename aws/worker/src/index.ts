@@ -3,8 +3,10 @@ import * as AWSXRay from "aws-xray-sdk-core";
 import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
+import { AwsSecretsManagerSecretsProvider } from "@mcma/aws-secrets-manager";
 
-import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
+import { AuthProvider, mcmaApiKeyAuth, ResourceManagerProvider } from "@mcma/client";
 import { ProviderCollection, Worker, WorkerRequest, WorkerRequestProperties } from "@mcma/worker";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { awsV4Auth } from "@mcma/aws-client";
@@ -18,8 +20,10 @@ import { cancelJob, deleteJob, failJob, processNotification, restartJob, startJo
 const cloudWatchEventsClient = AWSXRay.captureAWSv3Client(new CloudWatchEventsClient({}));
 const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
 const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
+const secretsManagerClient = AWSXRay.captureAWSv3Client(new SecretsManagerClient({}));
 
-const authProvider = new AuthProvider().add(awsV4Auth());
+const secretsProvider = new AwsSecretsManagerSecretsProvider({ client: secretsManagerClient });
+const authProvider = new AuthProvider().add(awsV4Auth()).add(mcmaApiKeyAuth({ secretsProvider }));
 const resourceManagerProvider = new ResourceManagerProvider(authProvider);
 const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-worker", getLogGroupName(), cloudWatchLogsClient);
 

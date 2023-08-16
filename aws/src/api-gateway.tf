@@ -26,6 +26,8 @@ resource "aws_apigatewayv2_integration" "service_api" {
 }
 
 resource "aws_apigatewayv2_route" "service_api_options" {
+  count = var.api_security_auth_type == "AWS4" ? 1 : 0
+
   api_id             = aws_apigatewayv2_api.service_api.id
   route_key          = "OPTIONS /{proxy+}"
   authorization_type = "NONE"
@@ -33,6 +35,8 @@ resource "aws_apigatewayv2_route" "service_api_options" {
 }
 
 resource "aws_lambda_permission" "service_api_options" {
+  count = var.api_security_auth_type == "AWS4" ? 1 : 0
+
   statement_id  = "AllowExecutionFromAPIGatewayOptions"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api_handler.arn
@@ -43,7 +47,7 @@ resource "aws_lambda_permission" "service_api_options" {
 resource "aws_apigatewayv2_route" "service_api_default" {
   api_id             = aws_apigatewayv2_api.service_api.id
   route_key          = "$default"
-  authorization_type = "AWS_IAM"
+  authorization_type = var.api_security_auth_type == "AWS4" ? "AWS_IAM" : "NONE"
   target             = "integrations/${aws_apigatewayv2_integration.service_api.id}"
 }
 
@@ -80,6 +84,5 @@ resource "aws_apigatewayv2_stage" "service_api" {
 }
 
 locals {
-  service_url       = "${aws_apigatewayv2_api.service_api.api_endpoint}/${var.stage_name}"
-  service_auth_type = "AWS4"
+  service_url = "${aws_apigatewayv2_api.service_api.api_endpoint}/${var.stage_name}"
 }

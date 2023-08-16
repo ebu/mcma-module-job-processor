@@ -99,7 +99,22 @@ resource "aws_iam_role_policy" "api_handler" {
         Action   = "execute-api:Invoke"
         Resource = var.execute_api_arns
       },
+      {
+        Sid      = "AllowReadingApiKey"
+        Effect   = "Allow"
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.api_key.arn
+      },
     ],
+      var.api_security_auth_type == "McmaApiKey" ?
+      [
+        {
+          Sid      = "AllowReadingApiKeySecurityConfig"
+          Effect   = "Allow"
+          Action   = "secretsmanager:GetSecretValue"
+          Resource = aws_secretsmanager_secret.api_key_security_config[0].arn
+        }
+      ] : [],
       var.xray_tracing_enabled ?
       [
         {
@@ -138,11 +153,14 @@ resource "aws_lambda_function" "api_handler" {
 
   environment {
     variables = {
-      MCMA_TABLE_NAME                 = aws_dynamodb_table.service_table.name
-      MCMA_PUBLIC_URL                 = local.service_url
-      MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
-      MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
-      MCMA_WORKER_FUNCTION_ID         = local.lambda_name_worker
+      MCMA_TABLE_NAME                        = aws_dynamodb_table.service_table.name
+      MCMA_PUBLIC_URL                        = local.service_url
+      MCMA_SERVICE_REGISTRY_URL              = var.service_registry.service_url
+      MCMA_SERVICE_REGISTRY_AUTH_TYPE        = var.service_registry.auth_type
+      MCMA_WORKER_FUNCTION_ID                = local.lambda_name_worker
+      MCMA_API_KEY_SECRET_ID                 = aws_secretsmanager_secret.api_key.name
+      MCMA_API_KEY_SECURITY_CONFIG_SECRET_ID = var.api_security_auth_type == "McmaApiKey" ? aws_secretsmanager_secret.api_key_security_config[0].name : ""
+      MCMA_API_KEY_SECURITY_CONFIG_HASH      = var.api_security_auth_type == "McmaApiKey" ? sha256(aws_secretsmanager_secret_version.api_key_security_config[0].secret_string) : ""
     }
   }
 

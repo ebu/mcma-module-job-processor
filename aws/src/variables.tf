@@ -124,3 +124,31 @@ variable "custom_job_types" {
   description = "Optionally add custom job types"
   default     = []
 }
+
+#########################
+# MCMA Api Key Authentication
+#########################
+
+variable "api_keys_read_only" {
+  type    = list(string)
+  default = []
+}
+
+variable "api_keys_read_write" {
+  type    = list(string)
+  default = []
+}
+
+#########################
+# Selecting API Authentication
+#########################
+
+variable "api_security_auth_type" {
+  type    = string
+  default = "McmaApiKey"
+
+  validation {
+    condition     = var.api_security_auth_type == null || can(regex("^(AWS4|McmaApiKey)$", var.api_security_auth_type))
+    error_message = "ERROR: Valid auth types are \"AWS4\" and \"McmaApiKey\"!"
+  }
+}

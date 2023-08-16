@@ -1,10 +1,15 @@
 output "auth_type" {
-  value = local.service_auth_type
+  value = var.api_security_auth_type
 }
 
 output "service_url" {
-  depends_on = [ mcma_service.service ]
-  value = local.service_url
+  depends_on = [mcma_service.service]
+  value      = local.service_url
+}
+
+output "api_key" {
+  sensitive = true
+  value     = random_password.api_key.result
 }
 
 output "aws_iam_role" {

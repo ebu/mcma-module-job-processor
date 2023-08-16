@@ -94,6 +94,12 @@ resource "aws_iam_role_policy" "worker" {
         Resource = var.execute_api_arns
       },
       {
+        Sid      = "AllowReadingApiKey"
+        Effect   = "Allow"
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.api_key.arn
+      },
+      {
         Sid    = "AllowEnablingDisabling"
         Effect = "Allow"
         Action = [
@@ -157,6 +163,7 @@ resource "aws_lambda_function" "worker" {
       MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
       MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
       CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.periodic_job_checker_trigger.name,
+      MCMA_API_KEY_SECRET_ID          = aws_secretsmanager_secret.api_key.name
     }
   }
 
