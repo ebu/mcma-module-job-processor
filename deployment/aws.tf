@@ -28,7 +28,7 @@ provider "mcma" {
 ############################################
 
 resource "aws_cloudwatch_log_group" "main" {
-  name = "/mcma/${var.global_prefix}"
+  name = "/mcma/${var.prefix}"
 }
 
 #########################
@@ -36,9 +36,9 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.16.1-beta3/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.16.1-beta6/module.zip"
 
-  prefix = "${var.global_prefix}-service-registry"
+  prefix = "${var.prefix}-service-registry"
 
   stage_name = var.environment_type
 
@@ -69,10 +69,10 @@ module "job_processor_aws" {
 
   source = "../aws/build/staging"
 
-  prefix = "${var.global_prefix}-job-processor"
+  prefix = "${var.prefix}-job-processor"
 
   stage_name     = var.environment_type
-  dashboard_name = var.global_prefix
+  dashboard_name = var.prefix
 
   aws_region = var.aws_region
 

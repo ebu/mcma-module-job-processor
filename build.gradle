@@ -143,6 +143,7 @@ task verifyTsc {
 
 task build {
     dependsOn "aws:build"
+    dependsOn "azure:build"
 }
 
 task clean {}

@@ -13,9 +13,8 @@ import { awsV4Auth } from "@mcma/aws-client";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 import { AwsSecretsManagerSecretsProvider } from "@mcma/aws-secrets-manager";
 
-import { DataController } from "@local/job-processor";
-import { JobRoutes } from "./job-routes";
-import { JobExecutionRoutes } from "./job-execution-routes";
+import { AwsDataController, buildDbTableProvider} from "@local/data-aws";
+import { JobRoutes, JobExecutionRoutes } from "@local/api";
 
 const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
 const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
@@ -27,7 +26,7 @@ const loggerProvider = new ConsoleLoggerProvider("job-processor-api-handler");
 const resourceManagerProvider = new ResourceManagerProvider(authProvider);
 const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), false, dynamoDBClient);
+const dataController = new AwsDataController(getTableName(), getPublicUrl(), buildDbTableProvider(false, dynamoDBClient));
 const jobRoutes = new JobRoutes(dataController, resourceManagerProvider, workerInvoker);
 const jobExecutionRoutes = new JobExecutionRoutes(dataController, workerInvoker);
 

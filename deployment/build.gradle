@@ -5,18 +5,25 @@ task generateTerraformTFVars {
     inputs.property("environment_type", environmentType)
     inputs.property("aws_profile", awsProfile)
     inputs.property("aws_region", awsRegion)
+    inputs.property("azure_subscription_id", azureSubscriptionId)
+    inputs.property("azure_tenant_id", azureTenantId)
+    inputs.property("azure_location", azureLocation)
 
     def propertyFile = file("${projectDir}/terraform.tfvars.json")
     outputs.file(propertyFile)
 
     doLast {
         def data = [
-                environment_name: environmentName,
-                environment_type: environmentType,
-                global_prefix   : "${environmentName}.${environmentType}".replace(".", "-"),
+                environment_name     : environmentName,
+                environment_type     : environmentType,
+                prefix               : "${environmentName}.${environmentType}".replace(".", "-"),
 
-                aws_profile     : awsProfile,
-                aws_region      : awsRegion,
+                aws_profile          : awsProfile,
+                aws_region           : awsRegion,
+
+                azure_subscription_id: azureSubscriptionId,
+                azure_tenant_id      : azureTenantId,
+                azure_location       : azureLocation
         ]
 
         def json = JsonOutput.toJson(data)
@@ -28,6 +35,7 @@ task generateTerraformTFVars {
 
 task terraformInit(type: Exec) {
     dependsOn ":verifyTerraform"
+    dependsOn ":build"
     inputs.files fileTree(dir: '.', include: '*.tf')
     outputs.upToDateWhen { file(".terraform").exists() }
     commandLine terraformExecutable
@@ -37,8 +45,8 @@ task terraformInit(type: Exec) {
 
 task terraformInitUpgrade(type: Exec) {
     dependsOn ":verifyTerraform"
-    inputs.file "main.tf"
-    inputs.file "versions.tf"
+    dependsOn ":build"
+    inputs.files fileTree(dir: '.', include: '*.tf')
     outputs.upToDateWhen { file(".terraform").exists() }
     commandLine terraformExecutable
     args "init", "-upgrade"

@@ -1,0 +1,34 @@
+apply from: "${project.rootDir}/gradle-tasks-for-module.gradle"
+
+task copyApiHandler(type: Copy) {
+    dependsOn "api-handler:build"
+    from file("api-handler/build/dist/function.zip")
+    into "build/staging/functions"
+    rename { "api-handler.zip" }
+}
+
+//task copyPeriodicJobChecker(type: Copy) {
+//    dependsOn "periodic-job-checker:build"
+//    from file("periodic-job-checker/build/dist/function.zip")
+//    into "build/staging/functions"
+//    rename { "periodic-job-checker.zip" }
+//}
+//
+//task copyPeriodicJobCleanup(type: Copy) {
+//    dependsOn "periodic-job-cleanup:build"
+//    from file("periodic-job-cleanup/build/dist/function.zip")
+//    into "build/staging/functions"
+//    rename { "periodic-job-cleanup.zip" }
+//}
+
+task copyWorker(type: Copy) {
+    dependsOn "worker:build"
+    from file("worker/build/dist/function.zip")
+    into "build/staging/functions"
+    rename { "worker.zip" }
+}
+
+build.dependsOn copyApiHandler
+//build.dependsOn copyPeriodicJobChecker
+//build.dependsOn copyPeriodicJobCleanup
+build.dependsOn copyWorker

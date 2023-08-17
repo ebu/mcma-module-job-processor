@@ -8,11 +8,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Job, JobStatus, McmaTracker } from "@mcma/core";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
-
-import { DataController } from "@local/job-processor";
 import { getTableName } from "@mcma/data";
 import { getPublicUrl } from "@mcma/api";
 import { getWorkerFunctionId } from "@mcma/worker-invoker";
+
+import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 
 const { JOB_RETENTION_PERIOD_IN_DAYS } = process.env;
 
@@ -23,7 +23,7 @@ const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
 const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-cleanup", getLogGroupName(), cloudWatchLogsClient);
 const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), false, dynamoDBClient);
+const dataController = new AwsDataController(getTableName(), getPublicUrl(), buildDbTableProvider(false, dynamoDBClient));
 
 export async function handler(event: ScheduledEvent, context: Context) {
     const tracker = new McmaTracker({

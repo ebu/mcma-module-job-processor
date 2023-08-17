@@ -11,8 +11,9 @@ import { getTableName } from "@mcma/data";
 import { getPublicUrl } from "@mcma/api";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
+import { disableEventRule, enableEventRule } from "@mcma/aws-cloudwatch-events";
 
-import { DataController, disableEventRule, enableEventRule } from "@local/job-processor";
+import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 import { getWorkerFunctionId } from "@mcma/worker-invoker";
 
 const { CLOUD_WATCH_EVENT_RULE, DEFAULT_JOB_TIMEOUT_IN_MINUTES } = process.env;
@@ -25,7 +26,7 @@ const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
 const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-periodic-job-checker", getLogGroupName(), cloudWatchLogsClient);
 const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
 
-const dataController = new DataController(getTableName(), getPublicUrl(), false, dynamoDBClient);
+const dataController = new AwsDataController(getTableName(), getPublicUrl(), buildDbTableProvider(false, dynamoDBClient));
 
 export async function handler(event: ScheduledEvent, context: Context) {
     const tracker = new McmaTracker({

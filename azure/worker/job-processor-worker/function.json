@@ -1,0 +1,10 @@
+{
+    "bindings": [
+        {
+            "type": "queueTrigger",
+            "direction": "in",
+            "name": "queueMessage",
+            "queueName": "job-processor-worker"
+        }
+    ]
+}

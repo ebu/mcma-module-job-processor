@@ -88,12 +88,6 @@ resource "aws_iam_role_policy" "worker" {
         ]
       },
       {
-        Sid      = "AllowInvokingApiGateway"
-        Effect   = "Allow"
-        Action   = "execute-api:Invoke"
-        Resource = var.execute_api_arns
-      },
-      {
         Sid      = "AllowReadingApiKey"
         Effect   = "Allow"
         Action   = "secretsmanager:GetSecretValue"
@@ -110,6 +104,15 @@ resource "aws_iam_role_policy" "worker" {
         Resource = aws_cloudwatch_event_rule.periodic_job_checker_trigger.arn
       },
     ],
+      length(var.execute_api_arns) > 0 ?
+      [
+        {
+          Sid      = "AllowInvokingApiGateway"
+          Effect   = "Allow"
+          Action   = "execute-api:Invoke"
+          Resource = var.execute_api_arns
+        }
+      ] : [],
       var.xray_tracing_enabled ?
       [
         {

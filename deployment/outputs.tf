@@ -4,13 +4,7 @@ output "service_registry_aws" {
     service_url = module.service_registry_aws.service_url
   }
 }
-#
-#output "service_registry_azure" {
-#  value = {
-#    auth_type   = module.service_registry_azure.auth_type
-#    service_url = module.service_registry_azure.service_url
-#  }
-#}
+
 
 output "job_processor_aws" {
   sensitive = true
@@ -18,6 +12,22 @@ output "job_processor_aws" {
     auth_type   = module.job_processor_aws.auth_type
     service_url = module.job_processor_aws.service_url
     api_key     = module.job_processor_aws.api_key
+  }
+}
+
+output "service_registry_azure" {
+  value = {
+    auth_type   = module.service_registry_azure.auth_type
+    service_url = module.service_registry_azure.service_url
+  }
+}
+
+output "job_processor_azure" {
+  sensitive = true
+  value     = {
+    auth_type   = module.job_processor_azure.auth_type
+    service_url = module.job_processor_azure.service_url
+    api_key     = module.job_processor_azure.api_key
   }
 }
 

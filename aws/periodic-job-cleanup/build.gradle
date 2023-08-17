@@ -1,5 +1,6 @@
 apply from: "${project.rootDir}/gradle-tasks-for-lambda.gradle"
 
 npmInstall {
-    dependsOn ":aws:lib-common:npmPack"
+    dependsOn ":libraries:data:npmPack"
+    dependsOn ":libraries:data-aws:npmPack"
 }

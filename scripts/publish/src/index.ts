@@ -7,14 +7,16 @@ const { MODULE_NAMESPACE, MODULE_NAME, MODULE_VERSION, MODULE_REPOSITORY } = pro
 
 let s3Client = new S3Client({ credentials: fromIni() });
 
-async function main() {
+async function publishModule(provider: "aws" | "azure", moduleZipFile: string) {
+    console.log();
     console.log("Publishing to Module Repository");
     console.log("Repository: " + MODULE_REPOSITORY);
     console.log("Namespace:  " + MODULE_NAMESPACE);
     console.log("Name:       " + MODULE_NAME);
+    console.log("Provider:   " + provider);
     console.log("Version:    " + MODULE_VERSION);
 
-    const objectKey = `${MODULE_NAMESPACE}/${MODULE_NAME}/aws/${MODULE_VERSION}/module.zip`;
+    const objectKey = `${MODULE_NAMESPACE}/${MODULE_NAME}/${provider}/${MODULE_VERSION}/module.zip`;
 
     const locationCommandOutput = await s3Client.send(new GetBucketLocationCommand({ Bucket: MODULE_REPOSITORY }));
     s3Client = new S3Client({
@@ -36,12 +38,12 @@ async function main() {
         throw new McmaException("Version already exists in module repository. Change the version number!");
     }
 
-    console.log("Uploading AWS version");
+    console.log(`Uploading ${provider} version`);
     try {
         await s3Client.send(new PutObjectCommand({
             Bucket: MODULE_REPOSITORY,
             Key: objectKey,
-            Body: fs.createReadStream("../../aws/build/dist/module.zip"),
+            Body: fs.createReadStream(moduleZipFile),
             ACL: "public-read"
         }));
     } catch (error) {
@@ -49,9 +51,14 @@ async function main() {
         await s3Client.send(new PutObjectCommand({
             Bucket: MODULE_REPOSITORY,
             Key: objectKey,
-            Body: fs.createReadStream("../../aws/build/dist/module.zip"),
+            Body: fs.createReadStream(moduleZipFile),
         }));
     }
+}
+
+async function main() {
+    await publishModule("aws", "../../aws/build/dist/module.zip");
+    await publishModule("azure", "../../azure/build/dist/module.zip");
 }
 
 main().then(() => console.log("Done")).catch(reason => console.error(reason));

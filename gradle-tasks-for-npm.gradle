@@ -1,7 +1,7 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
-def McmaVersion = "0.16.3-beta10"
+def McmaVersion = "0.16.3-beta11"
 
 task setMcmaVersion {
     def packageJson = file("package.json")
@@ -102,7 +102,7 @@ task tsc(type: Exec) {
     dependsOn ":verifyNodeJS"
     dependsOn ":verifyTsc"
     dependsOn npmInstall
-    inputs.dir("src")
+    inputs.files fileTree(dir: '.', include: '**/*.ts')
     inputs.file("package.json")
     inputs.file("tsconfig.json")
     inputs.file "${project.rootDir}/tsconfig.json"
