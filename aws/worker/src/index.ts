@@ -4,8 +4,8 @@ import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
-import { AwsSecretsManagerSecretsProvider } from "@mcma/aws-secrets-manager";
 
+import { AwsSecretsManagerSecretsProvider } from "@mcma/aws-secrets-manager";
 import { AuthProvider, mcmaApiKeyAuth, ResourceManagerProvider } from "@mcma/client";
 import { WorkerRequest, WorkerRequestProperties } from "@mcma/worker";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";

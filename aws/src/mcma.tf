@@ -17,7 +17,7 @@ resource "mcma_service" "service" {
   auth_type = var.api_security_auth_type
 
   dynamic "resource" {
-    for_each = concat(["AmeJob", "AIJob", "CaptureJob", "DistributionJob", "QAJob", "TransferJob", "TransformJob", "WorkflowJob"], var.custom_job_types)
+    for_each = concat(["AmeJob", "AIJob", "CaptureJob", "DistributionJob", "QAJob", "StorageJob", "TransformJob", "WorkflowJob"], var.custom_job_types)
     content {
       resource_type = resource.value
       http_endpoint = "${local.service_url}/jobs"
