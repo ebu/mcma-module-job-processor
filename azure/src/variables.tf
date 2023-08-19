@@ -46,6 +46,13 @@ variable "cosmosdb_account" {
   })
 }
 
+variable "cosmosdb_database" {
+  type = object({
+    name = string
+  })
+  default = null
+}
+
 variable "app_insights" {
   type = object({
     name                = string

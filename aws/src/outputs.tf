@@ -107,3 +107,17 @@ output "aws_cloudwatch_dashboard" {
     dashboard = aws_cloudwatch_dashboard.dashboard
   }
 }
+
+output "aws_secretsmanager_secret" {
+  value = {
+    api_key                 = aws_secretsmanager_secret.api_key
+    api_key_security_config = aws_secretsmanager_secret.api_key_security_config
+  }
+}
+
+output "aws_secretsmanager_secret_version" {
+  value = {
+    api_key                 = aws_secretsmanager_secret_version.api_key
+    api_key_security_config = aws_secretsmanager_secret_version.api_key_security_config
+  }
+}

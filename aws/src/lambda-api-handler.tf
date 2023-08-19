@@ -93,12 +93,7 @@ resource "aws_iam_role_policy" "api_handler" {
         Action   = "lambda:InvokeFunction"
         Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.lambda_name_worker}"
       },
-      {
-        Sid      = "AllowInvokingApiGateway"
-        Effect   = "Allow"
-        Action   = "execute-api:Invoke"
-        Resource = var.execute_api_arns
-      },
+
       {
         Sid      = "AllowReadingApiKey"
         Effect   = "Allow"
@@ -106,6 +101,15 @@ resource "aws_iam_role_policy" "api_handler" {
         Resource = aws_secretsmanager_secret.api_key.arn
       },
     ],
+      length(var.execute_api_arns) > 0 ?
+      [
+        {
+          Sid      = "AllowInvokingApiGateway"
+          Effect   = "Allow"
+          Action   = "execute-api:Invoke"
+          Resource = var.execute_api_arns
+        }
+      ] : [],
       var.api_security_auth_type == "McmaApiKey" ?
       [
         {

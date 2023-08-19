@@ -42,7 +42,7 @@ resource "azurerm_windows_function_app" "worker" {
     MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
 
     MCMA_TABLE_NAME            = azurerm_cosmosdb_sql_container.service.name
-    MCMA_COSMOS_DB_DATABASE_ID = azurerm_cosmosdb_sql_database.service.name
+    MCMA_COSMOS_DB_DATABASE_ID = local.cosmosdb_database_name
     MCMA_COSMOS_DB_ENDPOINT    = var.cosmosdb_account.endpoint
     MCMA_COSMOS_DB_KEY         = var.cosmosdb_account.primary_key
     MCMA_COSMOS_DB_REGION      = var.resource_group.location
