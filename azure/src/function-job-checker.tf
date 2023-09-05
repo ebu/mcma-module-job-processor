@@ -1,17 +1,15 @@
 locals {
-  api_handler_zip_file      = "${path.module}/functions/api-handler.zip"
-  api_handler_function_name = format("%.32s", replace("${var.prefix}api${var.resource_group.location}", "/[^a-z0-9]+/", ""))
-  service_url               = "https://${local.api_handler_function_name}.azurewebsites.net"
-  auth_type                 = "McmaApiKey"
+  job_checker_zip_file      = "${path.module}/functions/job-checker.zip"
+  job_checker_function_name = format("%.32s", replace("${var.prefix}jobchecker${var.resource_group.location}", "/[^a-z0-9]+/", ""))
 }
 
-resource "local_sensitive_file" "api_handler" {
-  filename = ".terraform/${filesha256(local.api_handler_zip_file)}.zip"
-  source   = local.api_handler_zip_file
+resource "local_sensitive_file" "job_checker" {
+  filename = ".terraform/${filesha256(local.job_checker_zip_file)}.zip"
+  source   = local.job_checker_zip_file
 }
 
-resource "azurerm_windows_function_app" "api_handler" {
-  name                = local.api_handler_function_name
+resource "azurerm_windows_function_app" "job_checker" {
+  name                = local.job_checker_function_name
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
 
@@ -33,7 +31,7 @@ resource "azurerm_windows_function_app" "api_handler" {
   }
 
   https_only      = true
-  zip_deploy_file = local_sensitive_file.api_handler.filename
+  zip_deploy_file = local_sensitive_file.job_checker.filename
 
   app_settings = {
     WEBSITE_RUN_FROM_PACKAGE = "1"
@@ -49,11 +47,8 @@ resource "azurerm_windows_function_app" "api_handler" {
     MCMA_COSMOS_DB_KEY         = var.cosmosdb_account.primary_key
     MCMA_COSMOS_DB_REGION      = var.resource_group.location
 
-    MCMA_KEY_VAULT_URL                     = azurerm_key_vault.service.vault_uri
-    MCMA_API_KEY_SECRET_ID                 = azurerm_key_vault_secret.api_key.name
-    MCMA_API_KEY_SECURITY_CONFIG_SECRET_ID = azurerm_key_vault_secret.api_key_security_config.name
-    MCMA_API_KEY_SECURITY_CONFIG_HASH      = sha256(azurerm_key_vault_secret.api_key_security_config.value)
-
     MCMA_WORKER_FUNCTION_ID = azurerm_storage_queue.worker.id
+
+    DEFAULT_JOB_TIMEOUT_IN_MINUTES = var.default_job_timeout_in_minutes
   }
 }

@@ -95,3 +95,18 @@ variable "service_registry" {
     service_url = string,
   })
 }
+
+#########################
+# Configuration
+#########################
+
+variable "default_job_timeout_in_minutes" {
+  type        = number
+  description = "Set default job timeout in minutes"
+  default     = 60
+}
+variable "job_retention_period_in_days" {
+  type        = number
+  description = "Set job retention period in days"
+  default     = 90
+}

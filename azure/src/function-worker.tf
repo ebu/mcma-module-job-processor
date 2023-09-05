@@ -57,10 +57,22 @@ resource "azurerm_storage_queue" "worker" {
   storage_account_name = var.app_storage_account.name
 }
 
-resource "azurerm_role_assignment" "queue_sender" {
+resource "azurerm_role_assignment" "queue_sender_api_handler" {
   scope                = azurerm_storage_queue.worker.resource_manager_id
   role_definition_name = "Storage Queue Data Message Sender"
   principal_id         = azurerm_windows_function_app.api_handler.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "queue_sender_job_checker" {
+  scope                = azurerm_storage_queue.worker.resource_manager_id
+  role_definition_name = "Storage Queue Data Message Sender"
+  principal_id         = azurerm_windows_function_app.job_checker.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "queue_sender_job_cleanup" {
+  scope                = azurerm_storage_queue.worker.resource_manager_id
+  role_definition_name = "Storage Queue Data Message Sender"
+  principal_id         = azurerm_windows_function_app.job_cleanup.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "queue_contributor" {

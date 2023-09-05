@@ -1,12 +1,12 @@
 #################################
-# Lambda periodic_job_checker
+# Lambda job_checker
 #################################
 
 locals {
-  lambda_name_periodic_job_checker = format("%.64s", replace("${var.prefix}-job-checker", "/[^a-zA-Z0-9_]+/", "-" ))
+  lambda_name_job_checker = format("%.64s", replace("${var.prefix}-job-checker", "/[^a-zA-Z0-9_]+/", "-" ))
 }
 
-resource "aws_iam_role" "periodic_job_checker" {
+resource "aws_iam_role" "job_checker" {
   name = format("%.64s", replace("${var.prefix}-${var.aws_region}-job-checker", "/[^a-zA-Z0-9_]+/", "-" ))
   path = var.iam_role_path
 
@@ -29,9 +29,9 @@ resource "aws_iam_role" "periodic_job_checker" {
   tags = var.tags
 }
 
-resource "aws_iam_role_policy" "periodic_job_checker" {
-  name = aws_iam_role.periodic_job_checker.name
-  role = aws_iam_role.periodic_job_checker.id
+resource "aws_iam_role_policy" "job_checker" {
+  name = aws_iam_role.job_checker.name
+  role = aws_iam_role.job_checker.id
 
   policy = jsonencode({
     Version   = "2012-10-17"
@@ -52,7 +52,7 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
         ]
         Resource = concat([
           "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${var.log_group.name}:*",
-          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.lambda_name_periodic_job_checker}:*",
+          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.lambda_name_job_checker}:*",
         ], var.enhanced_monitoring_enabled ? [
           "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda-insights:*",
         ] : [])
@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
           "events:EnableRule",
           "events:DisableRule",
         ],
-        Resource = aws_cloudwatch_event_rule.periodic_job_checker_trigger.arn
+        Resource = aws_cloudwatch_event_rule.job_checker_trigger.arn
       },
     ],
       var.xray_tracing_enabled ?
@@ -108,16 +108,16 @@ resource "aws_iam_role_policy" "periodic_job_checker" {
   })
 }
 
-resource "aws_lambda_function" "periodic_job_checker" {
+resource "aws_lambda_function" "job_checker" {
   depends_on = [
-    aws_iam_role_policy.periodic_job_checker
+    aws_iam_role_policy.job_checker
   ]
 
-  filename         = "${path.module}/lambdas/periodic-job-checker.zip"
-  function_name    = local.lambda_name_periodic_job_checker
-  role             = aws_iam_role.periodic_job_checker.arn
+  filename         = "${path.module}/lambdas/job-checker.zip"
+  function_name    = local.lambda_name_job_checker
+  role             = aws_iam_role.job_checker.arn
   handler          = "index.handler"
-  source_code_hash = filebase64sha256("${path.module}/lambdas/periodic-job-checker.zip")
+  source_code_hash = filebase64sha256("${path.module}/lambdas/job-checker.zip")
   runtime          = "nodejs18.x"
   timeout          = "900"
   memory_size      = "2048"
@@ -134,7 +134,7 @@ resource "aws_lambda_function" "periodic_job_checker" {
       MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
       MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
       MCMA_WORKER_FUNCTION_ID         = local.lambda_name_worker
-      CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.periodic_job_checker_trigger.name,
+      CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.job_checker_trigger.name,
       DEFAULT_JOB_TIMEOUT_IN_MINUTES  = var.default_job_timeout_in_minutes
     }
   }
@@ -146,8 +146,8 @@ resource "aws_lambda_function" "periodic_job_checker" {
   tags = var.tags
 }
 
-resource "aws_cloudwatch_event_rule" "periodic_job_checker_trigger" {
-  name                = format("%.64s", "${var.prefix}-periodic-job-checker-trigger")
+resource "aws_cloudwatch_event_rule" "job_checker_trigger" {
+  name                = format("%.64s", "${var.prefix}-job-checker-trigger")
   schedule_expression = "cron(* * * * ? *)"
 
   lifecycle {
@@ -157,15 +157,15 @@ resource "aws_cloudwatch_event_rule" "periodic_job_checker_trigger" {
   tags = var.tags
 }
 
-resource "aws_lambda_permission" "periodic_job_checker_trigger" {
+resource "aws_lambda_permission" "job_checker_trigger" {
   statement_id  = "AllowInvocationFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.periodic_job_checker.arn
+  function_name = aws_lambda_function.job_checker.arn
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.periodic_job_checker_trigger.arn
+  source_arn    = aws_cloudwatch_event_rule.job_checker_trigger.arn
 }
 
-resource "aws_cloudwatch_event_target" "periodic_job_checker_trigger" {
-  arn  = aws_lambda_function.periodic_job_checker.arn
-  rule = aws_cloudwatch_event_rule.periodic_job_checker_trigger.name
+resource "aws_cloudwatch_event_target" "job_checker_trigger" {
+  arn  = aws_lambda_function.job_checker.arn
+  rule = aws_cloudwatch_event_rule.job_checker_trigger.name
 }

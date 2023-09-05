@@ -7,18 +7,18 @@ task copyApiHandler(type: Copy) {
     rename { "api-handler.zip" }
 }
 
-task copyPeriodicJobChecker(type: Copy) {
-    dependsOn "periodic-job-checker:build"
-    from file("periodic-job-checker/build/dist/lambda.zip")
+task copyJobChecker(type: Copy) {
+    dependsOn "job-checker:build"
+    from file("job-checker/build/dist/lambda.zip")
     into "build/staging/lambdas"
-    rename { "periodic-job-checker.zip" }
+    rename { "job-checker.zip" }
 }
 
-task copyPeriodicJobCleanup(type: Copy) {
-    dependsOn "periodic-job-cleanup:build"
-    from file("periodic-job-cleanup/build/dist/lambda.zip")
+task copyJobCleanup(type: Copy) {
+    dependsOn "job-cleanup:build"
+    from file("job-cleanup/build/dist/lambda.zip")
     into "build/staging/lambdas"
-    rename { "periodic-job-cleanup.zip" }
+    rename { "job-cleanup.zip" }
 }
 
 task copyWorker(type: Copy) {
@@ -29,6 +29,6 @@ task copyWorker(type: Copy) {
 }
 
 build.dependsOn copyApiHandler
-build.dependsOn copyPeriodicJobChecker
-build.dependsOn copyPeriodicJobCleanup
+build.dependsOn copyJobChecker
+build.dependsOn copyJobCleanup
 build.dependsOn copyWorker

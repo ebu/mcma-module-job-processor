@@ -12,7 +12,9 @@ resource "mcma_service" "service" {
     azurerm_windows_function_app.worker,
     azurerm_storage_queue.worker,
     azurerm_role_assignment.queue_contributor,
-    azurerm_role_assignment.queue_sender,
+    azurerm_role_assignment.queue_sender_api_handler,
+    azurerm_role_assignment.queue_sender_job_checker,
+    azurerm_role_assignment.queue_sender_job_cleanup,
   ]
 
   name      = var.name

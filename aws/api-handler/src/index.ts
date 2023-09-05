@@ -46,9 +46,6 @@ const restController = new ApiGatewayApiController({
 });
 
 export async function handler(event: APIGatewayProxyEventV2, context: Context) {
-    console.log(JSON.stringify(event, null, 2));
-    console.log(JSON.stringify(context, null, 2));
-
     const logger = loggerProvider.get(context.awsRequestId);
     try {
         logger.functionStart(context.awsRequestId);

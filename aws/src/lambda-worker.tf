@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "worker" {
           "events:EnableRule",
           "events:DisableRule",
         ],
-        Resource = aws_cloudwatch_event_rule.periodic_job_checker_trigger.arn
+        Resource = aws_cloudwatch_event_rule.job_checker_trigger.arn
       },
     ],
       length(var.execute_api_arns) > 0 ?
@@ -165,7 +165,7 @@ resource "aws_lambda_function" "worker" {
       MCMA_PUBLIC_URL                 = local.service_url
       MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
       MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
-      CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.periodic_job_checker_trigger.name,
+      CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.job_checker_trigger.name,
       MCMA_API_KEY_SECRET_ID          = aws_secretsmanager_secret.api_key.name
     }
   }

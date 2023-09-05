@@ -152,7 +152,7 @@ export async function startExecution(job: Job, resourceManager: ResourceManager,
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
 
-        await context.enablePeriodicJobChecker();
+        await context.enableJobChecker();
     } catch (error) {
         jobExecution.status = JobStatus.Failed;
         jobExecution.error = new ProblemDetail({

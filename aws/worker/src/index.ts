@@ -45,7 +45,7 @@ export async function handler(event: WorkerRequestProperties, context: Context) 
         const workerContext: WorkerContext = {
             requestId: context.awsRequestId,
             dataController,
-            enablePeriodicJobChecker: async () => {
+            enableJobChecker: async () => {
                 await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEventsClient, context.awsRequestId, logger);
             }
         };

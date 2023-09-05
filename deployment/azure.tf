@@ -113,7 +113,7 @@ resource "azurerm_application_insights" "app_insights" {
 module "service_registry_azure" {
   source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.1-beta7/module.zip"
 
-  prefix = "${var.prefix}-service-registry"
+  prefix = "${var.prefix}-sr"
 
   resource_group      = azurerm_resource_group.resource_group
   app_storage_account = azurerm_storage_account.app_storage_account
@@ -142,7 +142,7 @@ module "job_processor_azure" {
 
   source = "../azure/build/staging"
 
-  prefix = "${var.prefix}-job-processor"
+  prefix = "${var.prefix}-jp"
 
   resource_group      = azurerm_resource_group.resource_group
   app_storage_account = azurerm_storage_account.app_storage_account

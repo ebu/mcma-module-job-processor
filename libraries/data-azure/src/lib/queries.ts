@@ -30,7 +30,7 @@ export function buildQuery<T extends JobBaseProperties>(queryParameters: JobReso
     return {
         path: partitionKey,
         sortBy: "dateCreated",
-        sortOrder: sortOrder,
+        sortOrder: sortOrder ?? QuerySortOrder.Descending,
         pageSize: pageSize,
         pageStartToken: pageStartToken,
         filterExpression: {

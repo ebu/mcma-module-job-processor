@@ -1,5 +1,5 @@
 {
-    "name": "@local/worker",
+    "name": "@local/job-cleanup",
     "version": "0.0.0",
     "private": true,
     "main": "index.js",
@@ -11,7 +11,7 @@
     "devDependencies": {
         "@mcma/core": "0.16.3-beta13",
         "@mcma/data": "0.16.3-beta13",
-        "@mcma/worker": "0.16.3-beta13",
+        "@mcma/worker-invoker": "0.16.3-beta13",
         "@types/node": "^18.15.11",
         "@types/uuid": "^9.0.1"
     },
@@ -19,6 +19,6 @@
         "@mcma/api": "0.16.3-beta13",
         "@mcma/core": "0.16.3-beta13",
         "@mcma/data": "0.16.3-beta13",
-        "@mcma/worker": "0.16.3-beta13"
+        "@mcma/worker-invoker": "0.16.3-beta13"
     }
 }

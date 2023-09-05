@@ -14,19 +14,19 @@ output "api_key" {
 
 output "aws_iam_role" {
   value = {
-    api_handler          = aws_iam_role.api_handler
-    periodic_job_checker = aws_iam_role.periodic_job_checker
-    periodic_job_cleanup = aws_iam_role.periodic_job_cleanup
-    worker               = aws_iam_role.worker
+    api_handler = aws_iam_role.api_handler
+    job_checker = aws_iam_role.job_checker
+    job_cleanup = aws_iam_role.job_cleanup
+    worker      = aws_iam_role.worker
   }
 }
 
 output "aws_iam_role_policy" {
   value = {
-    api_handler          = aws_iam_role_policy.api_handler
-    periodic_job_checker = aws_iam_role_policy.periodic_job_checker
-    periodic_job_cleanup = aws_iam_role_policy.periodic_job_cleanup
-    worker               = aws_iam_role_policy.worker
+    api_handler = aws_iam_role_policy.api_handler
+    job_checker = aws_iam_role_policy.job_checker
+    job_cleanup = aws_iam_role_policy.job_cleanup
+    worker      = aws_iam_role_policy.worker
   }
 }
 
@@ -38,33 +38,33 @@ output "aws_dynamodb_table" {
 
 output "aws_lambda_function" {
   value = {
-    api_handler          = aws_lambda_function.api_handler
-    periodic_job_checker = aws_lambda_function.periodic_job_checker
-    periodic_job_cleanup = aws_lambda_function.periodic_job_cleanup
-    worker               = aws_lambda_function.worker
+    api_handler = aws_lambda_function.api_handler
+    job_checker = aws_lambda_function.job_checker
+    job_cleanup = aws_lambda_function.job_cleanup
+    worker      = aws_lambda_function.worker
   }
 }
 
 output "aws_cloudwatch_event_rule" {
   value = {
-    periodic_job_checker_trigger = aws_cloudwatch_event_rule.periodic_job_checker_trigger
-    periodic_job_cleanup_trigger = aws_cloudwatch_event_rule.periodic_job_cleanup_trigger
+    job_checker_trigger = aws_cloudwatch_event_rule.job_checker_trigger
+    job_cleanup_trigger = aws_cloudwatch_event_rule.job_cleanup_trigger
   }
 }
 
 output "aws_lambda_permission" {
   value = {
-    periodic_job_checker_trigger = aws_lambda_permission.periodic_job_checker_trigger
-    periodic_job_cleanup_trigger = aws_lambda_permission.periodic_job_cleanup_trigger
-    service_api_default          = aws_lambda_permission.service_api_default
-    service_api_options          = aws_lambda_permission.service_api_options
+    job_checker_trigger = aws_lambda_permission.job_checker_trigger
+    job_cleanup_trigger = aws_lambda_permission.job_cleanup_trigger
+    service_api_default = aws_lambda_permission.service_api_default
+    service_api_options = aws_lambda_permission.service_api_options
   }
 }
 
 output "aws_cloudwatch_event_target" {
   value = {
-    periodic_job_checker_trigger = aws_cloudwatch_event_target.periodic_job_checker_trigger
-    periodic_job_cleanup_trigger = aws_cloudwatch_event_target.periodic_job_cleanup_trigger
+    job_checker_trigger = aws_cloudwatch_event_target.job_checker_trigger
+    job_cleanup_trigger = aws_cloudwatch_event_target.job_cleanup_trigger
   }
 }
 
