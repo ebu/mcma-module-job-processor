@@ -29,7 +29,7 @@ export async function handler(event: ScheduledEvent, context: Context) {
         label: "Job Cleanup - " + new Date().toUTCString()
     });
 
-    const logger = loggerProvider.get(context.awsRequestId, tracker);
+    const logger = await loggerProvider.get(context.awsRequestId, tracker);
     try {
         logger.functionStart(context.awsRequestId);
 

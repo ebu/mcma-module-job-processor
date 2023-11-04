@@ -42,7 +42,8 @@ export class JobRoutes extends McmaApiRouteCollection {
                 const jobProfile = await resourceManager.get<JobProfile>(job.jobProfileId);
                 label += " with JobProfile " + jobProfile.name;
             } catch (error) {
-                requestContext.getLogger().error(error);
+                const logger = await requestContext.getLogger();
+                logger?.error(error);
                 label += " with unknown JobProfile";
             }
 

@@ -75,6 +75,11 @@ variable "api_keys_read_write" {
   default = []
 }
 
+variable "key_vault_secret_expiration_date" {
+  type    = string
+  default = null
+}
+
 #########################
 # Custom Job Types
 #########################

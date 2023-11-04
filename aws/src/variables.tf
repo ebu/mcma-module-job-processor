@@ -13,11 +13,6 @@ variable "prefix" {
   description = "Prefix for all managed resources in this module"
 }
 
-variable "stage_name" {
-  type        = string
-  description = "Stage name to be used for the API Gateway deployment"
-}
-
 variable "log_group" {
   type = object({
     id   = string

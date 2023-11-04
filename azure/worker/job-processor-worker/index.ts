@@ -23,7 +23,7 @@ const worker = buildWorker(authProvider, loggerProvider, resourceManagerProvider
 
 export const handler: AzureFunction = async (context: Context) => {
     const queueMessage = context.bindings.queueMessage;
-    const logger = loggerProvider.get(context.invocationId);
+    const logger = await loggerProvider.get(context.invocationId);
 
     try {
         logger.functionStart(context.invocationId);

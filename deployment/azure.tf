@@ -111,7 +111,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.1-beta7/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.1/module.zip"
 
   prefix = "${var.prefix}-sr"
 
@@ -129,6 +129,8 @@ module "service_registry_azure" {
   api_keys_read_write = [
     random_password.deployment_api_key.result
   ]
+
+  key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
 }
 
 #########################
@@ -156,6 +158,8 @@ module "job_processor_azure" {
   api_keys_read_write = [
     random_password.deployment_api_key.result
   ]
+
+  key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
 }
 
 resource "mcma_job_profile" "transcribe_azure" {

@@ -10,15 +10,15 @@
         "uuid": "^9.0.0"
     },
     "devDependencies": {
-        "@mcma/azure-cosmos-db": "0.16.3-beta13",
-        "@mcma/core": "0.16.3-beta13",
-        "@mcma/data": "0.16.3-beta13",
+        "@mcma/azure-cosmos-db": "0.16.8",
+        "@mcma/core": "0.16.8",
+        "@mcma/data": "0.16.8",
         "@types/node": "^18.15.11",
         "@types/uuid": "^9.0.1"
     },
     "peerDependencies": {
-        "@mcma/azure-cosmos-db": "0.16.3-beta13",
-        "@mcma/core": "0.16.3-beta13",
-        "@mcma/data": "0.16.3-beta13"
+        "@mcma/azure-cosmos-db": "0.16.8",
+        "@mcma/core": "0.16.8",
+        "@mcma/data": "0.16.8"
     }
 }

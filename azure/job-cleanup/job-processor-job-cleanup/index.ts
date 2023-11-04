@@ -18,7 +18,7 @@ const workerInvoker = new QueueWorkerInvoker();
 const dataController = new AzureDataController(getTableName(), getPublicUrl(), dbTableProvider);
 
 export const handler: AzureFunction = async (context: Context, timer: any) => {
-    const logger = loggerProvider.get(context.invocationId);
+    const logger = await loggerProvider.get(context.invocationId);
     try {
         logger.functionStart(context.invocationId);
         logger.debug(context);

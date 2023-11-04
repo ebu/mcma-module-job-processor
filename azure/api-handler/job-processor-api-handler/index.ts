@@ -38,7 +38,7 @@ const restController =
         });
 
 export const handler: AzureFunction = async (context: Context, request: HttpRequest) => {
-    const logger = loggerProvider.get(context.invocationId);
+    const logger = await loggerProvider.get(context.invocationId);
     try {
         logger.functionStart(context.invocationId);
         logger.debug(context);

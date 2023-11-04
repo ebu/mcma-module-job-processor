@@ -36,11 +36,9 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.16.1-beta6/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.16.1/module.zip"
 
   prefix = "${var.prefix}-service-registry"
-
-  stage_name = var.environment_type
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
@@ -71,7 +69,6 @@ module "job_processor_aws" {
 
   prefix = "${var.prefix}-job-processor"
 
-  stage_name     = var.environment_type
   dashboard_name = var.prefix
 
   aws_region = var.aws_region

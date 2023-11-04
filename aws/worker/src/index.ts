@@ -35,7 +35,7 @@ const dataController = new AwsDataController(getTableName(), getPublicUrl(), bui
 const worker = buildWorker(authProvider, loggerProvider, resourceManagerProvider);
 
 export async function handler(event: WorkerRequestProperties, context: Context) {
-    const logger = loggerProvider.get(context.awsRequestId, event.tracker);
+    const logger = await loggerProvider.get(context.awsRequestId, event.tracker);
 
     try {
         logger.functionStart(context.awsRequestId);

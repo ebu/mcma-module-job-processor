@@ -24,7 +24,7 @@ export const handler: AzureFunction = async (context: Context, timer: any) => {
         label: "Job Checker - " + new Date().toUTCString()
     });
 
-    const logger = loggerProvider.get(context.invocationId, tracker);
+    const logger = await loggerProvider.get(context.invocationId, tracker);
     try {
         logger.functionStart(context.invocationId);
         logger.debug(context);
