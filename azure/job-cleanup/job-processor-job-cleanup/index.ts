@@ -1,4 +1,5 @@
 import { Context, AzureFunction } from "@azure/functions";
+import { v4 as uuidv4 } from "uuid";
 
 import { getPublicUrl } from "@mcma/api";
 
@@ -9,6 +10,7 @@ import { QueueWorkerInvoker } from "@mcma/azure-queue-worker-invoker";
 
 import { AzureDataController } from "@local/data-azure";
 import { JobCleanup } from "@local/job-cleanup";
+import { McmaTracker } from "@mcma/core";
 
 const loggerProvider = new AppInsightsLoggerProvider("job-processor-job-cleanup");
 const dbTableProvider = new CosmosDbTableProvider(fillOptionsFromConfigVariables());
@@ -18,7 +20,12 @@ const workerInvoker = new QueueWorkerInvoker();
 const dataController = new AzureDataController(getTableName(), getPublicUrl(), dbTableProvider);
 
 export const handler: AzureFunction = async (context: Context, timer: any) => {
-    const logger = await loggerProvider.get(context.invocationId);
+    const tracker = new McmaTracker({
+        id: uuidv4(),
+        label: "Job Cleanup - " + new Date().toUTCString()
+    });
+
+    const logger = await loggerProvider.get(context.invocationId, tracker);
     try {
         logger.functionStart(context.invocationId);
         logger.debug(context);
