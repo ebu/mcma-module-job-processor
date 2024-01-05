@@ -24,6 +24,8 @@ resource "azurerm_windows_function_app" "api_handler" {
       node_version = "~18"
     }
 
+    elastic_instance_minimum = var.function_elastic_instance_minimum
+
     application_insights_connection_string = var.app_insights.connection_string
     application_insights_key               = var.app_insights.instrumentation_key
   }

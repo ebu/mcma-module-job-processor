@@ -110,8 +110,15 @@ variable "default_job_timeout_in_minutes" {
   description = "Set default job timeout in minutes"
   default     = 60
 }
+
 variable "job_retention_period_in_days" {
   type        = number
   description = "Set job retention period in days"
   default     = 90
+}
+
+variable "function_elastic_instance_minimum" {
+  type        = number
+  description = "Set the minimum instance number for azure functions when using premium plan"
+  default     = null
 }
