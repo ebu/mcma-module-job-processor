@@ -151,7 +151,7 @@ resource "aws_cloudwatch_event_rule" "job_checker_trigger" {
   schedule_expression = "cron(* * * * ? *)"
 
   lifecycle {
-    ignore_changes = [is_enabled]
+    ignore_changes = [state]
   }
 
   tags = var.tags

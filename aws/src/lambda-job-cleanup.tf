@@ -158,7 +158,7 @@ resource "aws_lambda_function" "job_cleanup" {
 resource "aws_cloudwatch_event_rule" "job_cleanup_trigger" {
   name                = format("%.64s", "${var.prefix}-job-cleanup-trigger")
   schedule_expression = "cron(0 0 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 
   tags = var.tags
 }
