@@ -4,7 +4,7 @@
 
 resource "azurerm_service_plan" "app_service_plan_main" {
   count               = var.app_service_plan == null ? 1 : 0
-  name                = var.prefix
+  name                = "${var.prefix}-main"
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
   os_type             = "Windows"
@@ -15,7 +15,7 @@ resource "azurerm_service_plan" "app_service_plan_main" {
 
 resource "azurerm_service_plan" "app_service_plan_api" {
   count               = var.app_service_plan == null ? 1 : 0
-  name                = "${var.prefix}-worker"
+  name                = "${var.prefix}-api"
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
   os_type             = "Windows"
