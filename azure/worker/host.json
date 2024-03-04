@@ -10,7 +10,7 @@
     },
     "extensions": {
         "queues": {
-            "maxPollingInterval": "00:00:00.100"
+            "maxPollingInterval": "00:00:02"
         }
     },
     "logging": {
