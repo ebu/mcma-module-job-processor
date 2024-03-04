@@ -14,6 +14,8 @@ resource "azurerm_key_vault" "service" {
     default_action = "Deny"
     ip_rules       = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "azurerm_key_vault_access_policy" "deployment" {

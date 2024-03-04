@@ -20,6 +20,12 @@ variable "resource_group" {
   })
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "Tags applied to created resources"
+  default     = {}
+}
+
 ###########################
 # Azure accounts and plans
 ###########################
@@ -36,6 +42,7 @@ variable "app_service_plan" {
     id   = string
     name = string
   })
+  default = null
 }
 
 variable "cosmosdb_account" {

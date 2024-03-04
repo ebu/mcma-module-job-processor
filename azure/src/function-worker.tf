@@ -15,7 +15,7 @@ resource "azurerm_windows_function_app" "worker" {
 
   storage_account_name       = var.app_storage_account.name
   storage_account_access_key = var.app_storage_account.primary_access_key
-  service_plan_id            = var.app_service_plan.id
+  service_plan_id            = local.worker_app_service_plan_id
 
   site_config {
     application_stack {
@@ -52,6 +52,8 @@ resource "azurerm_windows_function_app" "worker" {
     MCMA_KEY_VAULT_URL     = azurerm_key_vault.service.vault_uri
     MCMA_API_KEY_SECRET_ID = azurerm_key_vault_secret.api_key.name
   }
+
+  tags = var.tags
 }
 
 resource "azurerm_storage_queue" "worker" {

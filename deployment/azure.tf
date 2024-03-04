@@ -46,19 +46,6 @@ resource "azurerm_storage_account" "app_storage_account" {
   account_replication_type = "LRS"
 }
 
-
-######################
-# App Service Plan
-######################
-
-resource "azurerm_service_plan" "app_service_plan" {
-  name                = var.prefix
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location            = azurerm_resource_group.resource_group.location
-  os_type             = "Windows"
-  sku_name            = "Y1"
-}
-
 ######################
 # Cosmos DB
 ######################
@@ -111,13 +98,12 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.5/module.zip"
+  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.7/module.zip"
 
   prefix = "${var.prefix}-sr"
 
   resource_group      = azurerm_resource_group.resource_group
   app_storage_account = azurerm_storage_account.app_storage_account
-  app_service_plan    = azurerm_service_plan.app_service_plan
   app_insights        = azurerm_application_insights.app_insights
   cosmosdb_account    = azurerm_cosmosdb_account.cosmosdb_account
   cosmosdb_database   = azurerm_cosmosdb_sql_database.cosmosdb_database
@@ -148,7 +134,6 @@ module "job_processor_azure" {
 
   resource_group      = azurerm_resource_group.resource_group
   app_storage_account = azurerm_storage_account.app_storage_account
-  app_service_plan    = azurerm_service_plan.app_service_plan
   app_insights        = azurerm_application_insights.app_insights
   cosmosdb_account    = azurerm_cosmosdb_account.cosmosdb_account
   cosmosdb_database   = azurerm_cosmosdb_sql_database.cosmosdb_database

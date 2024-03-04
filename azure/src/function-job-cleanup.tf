@@ -15,7 +15,7 @@ resource "azurerm_windows_function_app" "job_cleanup" {
 
   storage_account_name       = var.app_storage_account.name
   storage_account_access_key = var.app_storage_account.primary_access_key
-  service_plan_id            = var.app_service_plan.id
+  service_plan_id            = local.main_app_service_plan_id
 
   site_config {
     application_stack {
@@ -53,4 +53,6 @@ resource "azurerm_windows_function_app" "job_cleanup" {
 
     JOB_RETENTION_PERIOD_IN_DAYS = var.job_retention_period_in_days
   }
+
+  tags = var.tags
 }

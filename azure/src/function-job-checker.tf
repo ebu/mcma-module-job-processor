@@ -15,7 +15,7 @@ resource "azurerm_windows_function_app" "job_checker" {
 
   storage_account_name       = var.app_storage_account.name
   storage_account_access_key = var.app_storage_account.primary_access_key
-  service_plan_id            = var.app_service_plan.id
+  service_plan_id            = local.main_app_service_plan_id
 
   site_config {
     application_stack {
@@ -53,4 +53,6 @@ resource "azurerm_windows_function_app" "job_checker" {
 
     DEFAULT_JOB_TIMEOUT_IN_MINUTES = var.default_job_timeout_in_minutes
   }
+
+  tags = var.tags
 }
