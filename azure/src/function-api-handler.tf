@@ -17,17 +17,17 @@ resource "azurerm_windows_function_app" "api_handler" {
 
   storage_account_name       = var.app_storage_account.name
   storage_account_access_key = var.app_storage_account.primary_access_key
-  service_plan_id            = local.api_app_service_plan_id
+  service_plan_id            = local.app_service_plan_id
+
+  builtin_logging_enabled = false
 
   site_config {
     application_stack {
       node_version = "~18"
     }
 
-    elastic_instance_minimum = var.function_elastic_instance_minimum
-
+    elastic_instance_minimum               = var.function_elastic_instance_minimum
     application_insights_connection_string = var.app_insights.connection_string
-    application_insights_key               = var.app_insights.instrumentation_key
   }
 
   identity {

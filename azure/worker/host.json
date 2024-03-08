@@ -8,6 +8,11 @@
         "id": "Microsoft.Azure.Functions.ExtensionBundle",
         "version": "[3.3.0, 4.0.0)"
     },
+    "extensions": {
+        "queues": {
+            "maxPollingInterval": "00:00:02"
+        }
+    },
     "logging": {
         "logLevel": {
             "default": "Debug"
