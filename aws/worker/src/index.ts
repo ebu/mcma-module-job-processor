@@ -1,6 +1,5 @@
 import { Context } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
-import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
@@ -16,11 +15,7 @@ import { getPublicUrl } from "@mcma/api";
 import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 
 import { buildWorker, WorkerContext } from "@local/worker";
-import { enableEventRule } from "@mcma/aws-cloudwatch-events";
 
-const { CLOUD_WATCH_EVENT_RULE } = process.env;
-
-const cloudWatchEventsClient = AWSXRay.captureAWSv3Client(new CloudWatchEventsClient({}));
 const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
 const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
 const secretsManagerClient = AWSXRay.captureAWSv3Client(new SecretsManagerClient({}));
@@ -45,9 +40,6 @@ export async function handler(event: WorkerRequestProperties, context: Context) 
         const workerContext: WorkerContext = {
             requestId: context.awsRequestId,
             dataController,
-            enableJobChecker: async () => {
-                await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEventsClient, context.awsRequestId, logger);
-            }
         };
 
         await worker.doWork(new WorkerRequest(event, logger), workerContext);

@@ -33,11 +33,8 @@ export const handler: AzureFunction = async (context: Context, timer: any) => {
         const jobChecker = new JobChecker(
             logger,
             dataController,
-            {
-                enable: async () => { },
-                disable: async () => { }
-            },
-            workerInvoker
+            workerInvoker,
+            context.invocationId,
         );
 
         await jobChecker.run();

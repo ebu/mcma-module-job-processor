@@ -1,6 +1,5 @@
 import { Context, ScheduledEvent } from "aws-lambda";
 import * as AWSXRay from "aws-xray-sdk-core";
-import { CloudWatchEventsClient } from "@aws-sdk/client-cloudwatch-events";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { LambdaClient } from "@aws-sdk/client-lambda";
@@ -11,14 +10,10 @@ import { getTableName } from "@mcma/data";
 import { getPublicUrl } from "@mcma/api";
 import { AwsCloudWatchLoggerProvider, getLogGroupName } from "@mcma/aws-logger";
 import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
-import { disableEventRule, enableEventRule } from "@mcma/aws-cloudwatch-events";
 
 import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 import { JobChecker } from "@local/job-checker";
 
-const { CLOUD_WATCH_EVENT_RULE } = process.env;
-
-const cloudWatchEventsClient = AWSXRay.captureAWSv3Client(new CloudWatchEventsClient({}));
 const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
 const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
 const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
@@ -41,11 +36,8 @@ export async function handler(event: ScheduledEvent, context: Context) {
         const jobChecker = new JobChecker(
             logger,
             dataController,
-            {
-                enable: async () => { await enableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEventsClient, context.awsRequestId, logger); },
-                disable: async () => { await disableEventRule(CLOUD_WATCH_EVENT_RULE, await dataController.getDbTable(), cloudWatchEventsClient, context.awsRequestId, logger); }
-            },
-            workerInvoker
+            workerInvoker,
+            context.awsRequestId
         );
 
         await jobChecker.run();

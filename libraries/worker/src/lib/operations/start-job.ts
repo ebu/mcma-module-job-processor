@@ -151,8 +151,6 @@ export async function startExecution(job: Job, resourceManager: ResourceManager,
         job = await dataController.updateJob(job);
 
         await logJobEvent(logger, resourceManager, job, jobExecution);
-
-        await context.enableJobChecker();
     } catch (error) {
         jobExecution.status = JobStatus.Failed;
         jobExecution.error = new ProblemDetail({

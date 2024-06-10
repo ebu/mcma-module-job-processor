@@ -5,13 +5,11 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-cloudwatch-events": "^3.300.0",
         "@aws-sdk/client-cloudwatch-logs": "^3.300.0",
         "@aws-sdk/client-dynamodb": "^3.300.0",
         "@aws-sdk/client-lambda": "^3.300.0",
         "@mcma/api": "0.16.17",
         "@mcma/aws-client": "0.16.17",
-        "@mcma/aws-cloudwatch-events": "0.16.17",
         "@mcma/aws-dynamodb": "0.16.17",
         "@mcma/aws-lambda-worker-invoker": "0.16.17",
         "@mcma/aws-logger": "0.16.17",

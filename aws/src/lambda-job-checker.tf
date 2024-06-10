@@ -134,7 +134,6 @@ resource "aws_lambda_function" "job_checker" {
       MCMA_SERVICE_REGISTRY_URL       = var.service_registry.service_url
       MCMA_SERVICE_REGISTRY_AUTH_TYPE = var.service_registry.auth_type
       MCMA_WORKER_FUNCTION_ID         = local.lambda_name_worker
-      CLOUD_WATCH_EVENT_RULE          = aws_cloudwatch_event_rule.job_checker_trigger.name,
       DEFAULT_JOB_TIMEOUT_IN_MINUTES  = var.default_job_timeout_in_minutes
     }
   }
@@ -149,10 +148,6 @@ resource "aws_lambda_function" "job_checker" {
 resource "aws_cloudwatch_event_rule" "job_checker_trigger" {
   name                = format("%.64s", "${var.prefix}-job-checker-trigger")
   schedule_expression = "cron(* * * * ? *)"
-
-  lifecycle {
-    ignore_changes = [state]
-  }
 
   tags = var.tags
 }
