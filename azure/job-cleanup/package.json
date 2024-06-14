@@ -4,17 +4,17 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "@mcma/api": "0.16.17",
-        "@mcma/azure-cosmos-db": "0.16.17",
-        "@mcma/azure-logger": "0.16.17",
-        "@mcma/azure-queue-worker-invoker": "0.16.17",
-        "@mcma/core": "0.16.17",
-        "@mcma/data": "0.16.17",
-        "uuid": "^9.0.0"
+        "@mcma/api": "0.16.18",
+        "@mcma/azure-cosmos-db": "0.16.18",
+        "@mcma/azure-logger": "0.16.18",
+        "@mcma/azure-queue-worker-invoker": "0.16.18",
+        "@mcma/core": "0.16.18",
+        "@mcma/data": "0.16.18",
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@azure/functions": "^3.5.1",
         "@types/node": "^18.17.1",
-        "@types/uuid": "^9.0.2"
+        "@types/uuid": "^9.0.8"
     }
 }
