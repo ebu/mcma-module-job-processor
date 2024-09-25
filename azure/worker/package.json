@@ -2,7 +2,7 @@
     "name": "worker",
     "version": "0.0.0",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "Apache-2.0",
     "dependencies": {
         "@azure/functions": "^3.5.1",
         "@azure/keyvault-secrets": "^4.8.0",

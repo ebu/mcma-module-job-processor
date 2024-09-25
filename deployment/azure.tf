@@ -98,7 +98,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v0.16.13"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v0.16.15"
 
   prefix = "${var.prefix}-sr"
 
