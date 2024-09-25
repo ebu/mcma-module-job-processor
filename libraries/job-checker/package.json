@@ -9,15 +9,15 @@
         "uuid": "^9.0.1"
     },
     "devDependencies": {
-        "@mcma/core": "0.16.19",
-        "@mcma/data": "0.16.19",
-        "@mcma/worker-invoker": "0.16.19",
+        "@mcma/core": "0.16.21",
+        "@mcma/data": "0.16.21",
+        "@mcma/worker-invoker": "0.16.21",
         "@types/node": "^18.19.34",
         "@types/uuid": "^9.0.8"
     },
     "peerDependencies": {
-        "@mcma/core": "0.16.19",
-        "@mcma/data": "0.16.19",
-        "@mcma/worker-invoker": "0.16.19"
+        "@mcma/core": "0.16.21",
+        "@mcma/data": "0.16.21",
+        "@mcma/worker-invoker": "0.16.21"
     }
 }

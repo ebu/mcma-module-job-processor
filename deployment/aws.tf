@@ -36,12 +36,11 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/aws/0.16.11/module.zip"
+  source = "github.com/ebu/mcma-module-service-registry//aws/module?ref=v0.16.13"
 
   prefix = "${var.prefix}-service-registry"
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
 
   log_group                   = aws_cloudwatch_log_group.main
   api_gateway_metrics_enabled = true
@@ -65,7 +64,7 @@ module "job_processor_aws" {
     mcma = mcma.aws
   }
 
-  source = "../aws/build/staging"
+  source = "../aws/module"
 
   prefix = "${var.prefix}-job-processor"
 

@@ -15,6 +15,4 @@ include "aws",
         "libraries:data-azure",
         "libraries:job-checker",
         "libraries:job-cleanup",
-        "libraries:worker",
-        "scripts",
-        "scripts:publish"
+        "libraries:worker"

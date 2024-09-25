@@ -8,20 +8,20 @@
         "@azure/keyvault-secrets": "^4.8.0",
         "@azure/identity": "^4.2.1",
         "@azure/storage-queue": "^12.22.0",
-        "@mcma/api": "0.16.19",
-        "@mcma/azure-client": "0.16.19",
-        "@mcma/azure-cosmos-db": "0.16.19",
-        "@mcma/azure-functions-api": "0.16.19",
-        "@mcma/azure-key-vault": "0.16.19",
-        "@mcma/azure-logger": "0.16.19",
-        "@mcma/azure-queue-worker-invoker": "0.16.19",
-        "@mcma/client": "0.16.19",
-        "@mcma/core": "0.16.19",
-        "@mcma/data": "0.16.19",
-        "@mcma/worker": "0.16.19",
-        "@mcma/worker-invoker": "0.16.19"
+        "@mcma/api": "0.16.21",
+        "@mcma/azure-client": "0.16.21",
+        "@mcma/azure-cosmos-db": "0.16.21",
+        "@mcma/azure-functions-api": "0.16.21",
+        "@mcma/azure-key-vault": "0.16.21",
+        "@mcma/azure-logger": "0.16.21",
+        "@mcma/azure-queue-worker-invoker": "0.16.21",
+        "@mcma/client": "0.16.21",
+        "@mcma/core": "0.16.21",
+        "@mcma/data": "0.16.21",
+        "@mcma/worker": "0.16.21",
+        "@mcma/worker-invoker": "0.16.21"
     },
     "devDependencies": {
-        "@types/node": "^18.19.34"
+        "@types/node": "^18.19.51"
     }
 }

@@ -98,7 +98,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "https://ch-ebu-mcma-module-repository.s3.eu-central-1.amazonaws.com/ebu/service-registry/azure/0.16.11/module.zip"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v0.16.13"
 
   prefix = "${var.prefix}-sr"
 
@@ -128,7 +128,7 @@ module "job_processor_azure" {
     mcma = mcma.azure
   }
 
-  source = "../azure/build/staging"
+  source = "../azure/module"
 
   prefix = "${var.prefix}-jp"
 

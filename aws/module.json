@@ -1,8 +1,0 @@
-{
-    "namespace": "@MODULE_NAMESPACE@",
-    "name": "@MODULE_NAME@",
-    "provider": "aws",
-    "version": "@MODULE_VERSION@",
-    "displayName": "Job Processor",
-    "description": "The Job Processor is used for submitting and monitoring jobs"
-}
