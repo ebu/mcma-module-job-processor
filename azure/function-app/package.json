@@ -1,0 +1,29 @@
+{
+    "name": "job-processor",
+    "version": "0.0.0",
+    "description": "Azure Function App based MCMA job-processor",
+    "private": true,
+    "license": "Apache-2.0",
+    "main": "src/index.js",
+    "dependencies": {
+        "@azure/keyvault-secrets": "^4.9.0",
+        "@azure/identity": "^4.5.0",
+        "@mcma/api": "1.0.0-beta7",
+        "@mcma/azure-cosmos-db": "1.0.0-beta7",
+        "@mcma/azure-functions-api": "1.0.0-beta7",
+        "@mcma/azure-key-vault": "1.0.0-beta7",
+        "@mcma/azure-logger": "1.0.0-beta7",
+        "@mcma/azure-queue-worker-invoker": "1.0.0-beta7",
+        "@mcma/client": "1.0.0-beta7",
+        "@mcma/core": "1.0.0-beta7",
+        "@mcma/data": "1.0.0-beta7",
+        "@mcma/secrets": "1.0.0-beta7",
+        "@mcma/worker": "1.0.0-beta7",
+        "@mcma/worker-invoker": "1.0.0-beta7",
+        "uuid": "^11.0.3"
+    },
+    "devDependencies": {
+        "@azure/functions": "^4.6.0",
+        "@types/node": "^22.10.2"
+    }
+}

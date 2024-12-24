@@ -9,19 +9,22 @@ resource "azurerm_key_vault" "service" {
   soft_delete_retention_days = 7
   purge_protection_enabled   = false
 
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-    ip_rules       = ["0.0.0.0/0"]
+  dynamic "network_acls" {
+    for_each = var.use_flex_consumption_plan ? [] : [1]
+    content {
+      bypass         = "AzureServices"
+      default_action = "Deny"
+      ip_rules       = ["0.0.0.0/0"]
+    }
   }
 
   tags = var.tags
 }
 
 resource "azurerm_key_vault_access_policy" "deployment" {
-  key_vault_id       = azurerm_key_vault.service.id
-  tenant_id          = data.azurerm_client_config.current.tenant_id
-  object_id          = data.azurerm_client_config.current.object_id
+  key_vault_id = azurerm_key_vault.service.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
   secret_permissions = [
     "List",
     "Set",
@@ -30,22 +33,6 @@ resource "azurerm_key_vault_access_policy" "deployment" {
     "Purge",
     "Recover"
   ]
-}
-
-resource "azurerm_key_vault_access_policy" "api_handler" {
-  key_vault_id = azurerm_key_vault.service.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_windows_function_app.api_handler.identity[0].principal_id
-
-  secret_permissions = ["Get"]
-}
-
-resource "azurerm_key_vault_access_policy" "worker" {
-  key_vault_id = azurerm_key_vault.service.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_windows_function_app.worker.identity[0].principal_id
-
-  secret_permissions = ["Get"]
 }
 
 locals {
@@ -66,12 +53,12 @@ resource "azurerm_key_vault_secret" "api_key_security_config" {
 
   key_vault_id = azurerm_key_vault.service.id
   name         = "api-key-security-config"
-  value        = jsonencode(merge({
-    "no-auth"    = {}
+  value = jsonencode(merge({
+    "no-auth" = {}
     "valid-auth" = {
       "^/jobs(?:/.+)?$" = ["GET"]
     }
-  },
+    },
     local.api_keys_read_only,
     local.api_keys_read_write
   ))

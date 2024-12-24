@@ -128,7 +128,7 @@ resource "aws_lambda_function" "job_cleanup" {
   role             = aws_iam_role.job_cleanup.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/lambdas/job-cleanup.zip")
-  runtime          = "nodejs18.x"
+  runtime          = "nodejs22.x"
   timeout          = "900"
   memory_size      = "2048"
 

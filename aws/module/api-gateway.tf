@@ -66,7 +66,7 @@ resource "aws_apigatewayv2_stage" "service_api" {
   ]
 
   api_id      = aws_apigatewayv2_api.service_api.id
-  name        = "$default"
+  name        = coalesce(var.api_stage_name, "$default")
   auto_deploy = true
 
   default_route_settings {

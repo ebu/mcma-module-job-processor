@@ -77,6 +77,11 @@ variable "execute_api_arns" {
   default     = []
 }
 
+variable "api_stage_name" {
+  type    = string
+  default = null
+}
+
 #########################
 # Configuration
 #########################

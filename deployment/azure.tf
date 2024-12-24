@@ -38,7 +38,7 @@ resource "azurerm_resource_group" "resource_group" {
 # App Storage Account
 ######################
 
-resource "azurerm_storage_account" "app_storage_account" {
+resource "azurerm_storage_account" "storage_account" {
   name                     = format("%.24s", replace("${var.prefix}-${azurerm_resource_group.resource_group.location}", "/[^a-z0-9]+/", ""))
   resource_group_name      = azurerm_resource_group.resource_group.name
   location                 = azurerm_resource_group.resource_group.location
@@ -98,15 +98,15 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v0.16.15"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=nodejs22"
 
   prefix = "${var.prefix}-sr"
 
-  resource_group      = azurerm_resource_group.resource_group
-  app_storage_account = azurerm_storage_account.app_storage_account
-  app_insights        = azurerm_application_insights.app_insights
-  cosmosdb_account    = azurerm_cosmosdb_account.cosmosdb_account
-  cosmosdb_database   = azurerm_cosmosdb_sql_database.cosmosdb_database
+  resource_group    = azurerm_resource_group.resource_group
+  storage_account   = azurerm_storage_account.storage_account
+  app_insights      = azurerm_application_insights.app_insights
+  cosmosdb_account  = azurerm_cosmosdb_account.cosmosdb_account
+  cosmosdb_database = azurerm_cosmosdb_sql_database.cosmosdb_database
 
   api_keys_read_only = [
     module.job_processor_azure.api_key
@@ -132,11 +132,13 @@ module "job_processor_azure" {
 
   prefix = "${var.prefix}-jp"
 
-  resource_group      = azurerm_resource_group.resource_group
-  app_storage_account = azurerm_storage_account.app_storage_account
-  app_insights        = azurerm_application_insights.app_insights
-  cosmosdb_account    = azurerm_cosmosdb_account.cosmosdb_account
-  cosmosdb_database   = azurerm_cosmosdb_sql_database.cosmosdb_database
+  resource_group    = azurerm_resource_group.resource_group
+  storage_account   = azurerm_storage_account.storage_account
+  app_insights      = azurerm_application_insights.app_insights
+  cosmosdb_account  = azurerm_cosmosdb_account.cosmosdb_account
+  cosmosdb_database = azurerm_cosmosdb_sql_database.cosmosdb_database
+
+  use_flex_consumption_plan = true
 
   service_registry = module.service_registry_azure
 

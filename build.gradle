@@ -1,7 +1,7 @@
-def moduleVersion = "0.16.17"
+def moduleVersion = "1.0.0"
 
-def requiredVersionTerraform = "^1.1.9"
-def requiredVersionNodeJS = "^18.0.0"
+def requiredVersionTerraform = "^1.10.3"
+def requiredVersionNodeJS = "^22.0.0"
 def requiredVersionTsc = "^5.0.0"
 
 allprojects {
@@ -14,7 +14,7 @@ allprojects {
             tscExecutable = ["cmd", "/c", "tsc"]
             gitExecutable = ["git"]
         } else {
-            nodeExecutable = ["node"]
+            nodeExecutable = ["node"]d
             ngExecutable = ["ng"]
             npmExecutable = ["npm"]
             terraformExecutable = ["terraform"]

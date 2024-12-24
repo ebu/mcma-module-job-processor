@@ -5,24 +5,23 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-cloudwatch-logs": "^3.658.0",
-        "@aws-sdk/client-dynamodb": "^3.658.0",
-        "@aws-sdk/client-lambda": "^3.658.0",
-        "@mcma/api": "0.16.21",
-        "@mcma/aws-client": "0.16.21",
-        "@mcma/aws-dynamodb": "0.16.21",
-        "@mcma/aws-lambda-worker-invoker": "0.16.21",
-        "@mcma/aws-logger": "0.16.21",
-        "@mcma/client": "0.16.21",
-        "@mcma/core": "0.16.21",
-        "@mcma/data": "0.16.21",
-        "@mcma/worker-invoker": "0.16.21",
-        "aws-xray-sdk-core": "^3.10.1",
-        "uuid": "^10.0.0"
+        "@aws-sdk/client-cloudwatch-logs": "^3.714.0",
+        "@aws-sdk/client-dynamodb": "^3.714.0",
+        "@aws-sdk/client-lambda": "^3.714.0",
+        "@mcma/api": "1.0.0-beta7",
+        "@mcma/aws-client": "1.0.0-beta7",
+        "@mcma/aws-dynamodb": "1.0.0-beta7",
+        "@mcma/aws-lambda-worker-invoker": "1.0.0-beta7",
+        "@mcma/aws-logger": "1.0.0-beta7",
+        "@mcma/client": "1.0.0-beta7",
+        "@mcma/core": "1.0.0-beta7",
+        "@mcma/data": "1.0.0-beta7",
+        "@mcma/worker-invoker": "1.0.0-beta7",
+        "aws-xray-sdk-core": "^3.10.2",
+        "uuid": "^11.0.3"
     },
     "devDependencies": {
-        "@types/aws-lambda": "^8.10.145",
-        "@types/node": "^18.19.51",
-        "@types/uuid": "^10.0.0"
+        "@types/aws-lambda": "^8.10.146",
+        "@types/node": "^22.10.2"
     }
 }

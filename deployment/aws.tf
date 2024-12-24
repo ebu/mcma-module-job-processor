@@ -36,7 +36,7 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "github.com/ebu/mcma-module-service-registry//aws/module?ref=v0.16.15"
+  source = "github.com/ebu/mcma-module-service-registry//aws/module?ref=nodejs22"
 
   prefix = "${var.prefix}-service-registry"
 

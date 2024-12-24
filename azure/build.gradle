@@ -1,34 +1,10 @@
-task copyApiHandler(type: Copy) {
-    dependsOn "api-handler:build"
-    from file("api-handler/build/dist/function.zip")
-    into "module/functions"
-    rename { "api-handler.zip" }
-}
-
-task copyJobChecker(type: Copy) {
-    dependsOn "job-checker:build"
-    from file("job-checker/build/dist/function.zip")
-    into "module/functions"
-    rename { "job-checker.zip" }
-}
-
-task copyJobCleanup(type: Copy) {
-    dependsOn "job-cleanup:build"
-    from file("job-cleanup/build/dist/function.zip")
-    into "module/functions"
-    rename { "job-cleanup.zip" }
-}
-
-task copyWorker(type: Copy) {
-    dependsOn "worker:build"
-    from file("worker/build/dist/function.zip")
-    into "module/functions"
-    rename { "worker.zip" }
+task copyFunctionApp(type: Copy) {
+    dependsOn "function-app:build"
+    from file("function-app/build/dist/function.zip")
+    into "module"
+    rename { "function-app.zip" }
 }
 
 task build {
-    dependsOn copyApiHandler
-    dependsOn copyJobChecker
-    dependsOn copyJobCleanup
-    dependsOn copyWorker
+    dependsOn copyFunctionApp
 }

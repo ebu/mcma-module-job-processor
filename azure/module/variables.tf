@@ -13,13 +13,6 @@ variable "prefix" {
   description = "Prefix for all managed resources in this module"
 }
 
-variable "resource_group" {
-  type = object({
-    name     = string
-    location = string
-  })
-}
-
 variable "tags" {
   type        = map(string)
   description = "Tags applied to created resources"
@@ -30,14 +23,37 @@ variable "tags" {
 # Azure accounts and plans
 ###########################
 
-variable "app_storage_account" {
+variable "use_flex_consumption_plan" {
+  type        = bool
+  description = "Allow enabling / disabling the usage of flex consumption plan"
+  default     = true
+}
+
+variable "function_elastic_instance_minimum" {
+  type        = number
+  description = "Set the minimum instance number for azure functions when using premium plan"
+  default     = null
+}
+
+variable "resource_group" {
   type = object({
-    name               = string
-    primary_access_key = string
+    id       = string
+    name     = string
+    location = string
   })
 }
 
-variable "app_service_plan" {
+variable "storage_account" {
+  type = object({
+    id                        = string
+    name                      = string
+    primary_access_key        = string
+    primary_connection_string = string
+    primary_blob_endpoint     = string
+  })
+}
+
+variable "service_plan" {
   type = object({
     id   = string
     name = string
@@ -73,12 +89,12 @@ variable "app_insights" {
 #######################
 
 variable "api_keys_read_only" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "api_keys_read_write" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
@@ -122,10 +138,4 @@ variable "job_retention_period_in_days" {
   type        = number
   description = "Set job retention period in days"
   default     = 90
-}
-
-variable "function_elastic_instance_minimum" {
-  type        = number
-  description = "Set the minimum instance number for azure functions when using premium plan"
-  default     = null
 }

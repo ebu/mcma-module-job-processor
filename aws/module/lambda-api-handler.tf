@@ -147,7 +147,7 @@ resource "aws_lambda_function" "api_handler" {
   role             = aws_iam_role.api_handler.arn
   handler          = "index.handler"
   source_code_hash = filebase64sha256("${path.module}/lambdas/api-handler.zip")
-  runtime          = "nodejs18.x"
+  runtime          = "nodejs22.x"
   timeout          = "30"
   memory_size      = "2048"
 
