@@ -9,7 +9,7 @@
             "routePrefix": ""
         },
         "queues": {
-            "maxPollingInterval": "00:00:10"
+            "maxPollingInterval": "00:00:02"
         }
     },
     "logging": {

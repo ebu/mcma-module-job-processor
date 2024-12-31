@@ -99,7 +99,7 @@ export class JobChecker {
             if (activeJobs) {
                 this.logger.info(`There are ${activeJobs} active jobs remaining`);
             }
-        } catch (error) {
+        } finally {
             await mutex.unlock();
         }
     }
