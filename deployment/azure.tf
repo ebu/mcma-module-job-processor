@@ -64,15 +64,16 @@ resource "azurerm_cosmosdb_account" "cosmosdb_account" {
     failover_priority = 0
     location          = azurerm_resource_group.resource_group.location
   }
+
+  capabilities {
+    name = "EnableServerless"
+  }
 }
 
 resource "azurerm_cosmosdb_sql_database" "cosmosdb_database" {
   name                = var.prefix
   resource_group_name = azurerm_resource_group.resource_group.name
   account_name        = azurerm_cosmosdb_account.cosmosdb_account.name
-  autoscale_settings {
-    max_throughput = 1000
-  }
 }
 
 ########################

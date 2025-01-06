@@ -9,12 +9,12 @@
         "uuid": "^11.0.3"
     },
     "devDependencies": {
-        "@mcma/core": "1.0.0-beta7",
-        "@mcma/data": "1.0.0-beta7",
+        "@mcma/core": "1.0.0",
+        "@mcma/data": "1.0.0",
         "@types/node": "^22.10.2"
     },
     "peerDependencies": {
-        "@mcma/core": "1.0.0-beta7",
-        "@mcma/data": "1.0.0-beta7"
+        "@mcma/core": "1.0.0",
+        "@mcma/data": "1.0.0"
     }
 }
