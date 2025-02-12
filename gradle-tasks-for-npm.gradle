@@ -6,7 +6,7 @@ def McmaVersion = "1.0.0"
 task setMcmaVersion {
     def packageJson = file("package.json")
 
-    enabled packageJson.exists()
+    enabled = packageJson.exists()
     inputs.file(packageJson)
     inputs.property("VERSION", McmaVersion)
     outputs.file(packageJson)
@@ -38,6 +38,11 @@ task setMcmaVersion {
     }
 }
 
+interface InjectedExecOps {
+    @Inject
+    ExecOperations getExecOps()
+}
+
 task npmInstall(type: Exec) {
     dependsOn ":verifyNodeJS"
     inputs.file("package.json")
@@ -46,10 +51,12 @@ task npmInstall(type: Exec) {
     commandLine npmExecutable
     args "install"
 
+    def injected = project.objects.newInstance(InjectedExecOps)
+    def projectDir = project.projectDir
     def localLibraries = []
     afterEvaluate {
         dependsOn.collect().each {
-            if (it.endsWith(":npmPack")) {
+            if (it instanceof String && it.endsWith(":npmPack")) {
                 def parts = it.toString().split(":")
 
                 def directory = "${project.rootDir}/"
@@ -70,8 +77,9 @@ task npmInstall(type: Exec) {
     }
     doLast {
         if (!localLibraries.empty) {
-            exec {
+            injected.execOps.exec {
                 commandLine npmExecutable
+                workingDir projectDir
                 args "install"
                 localLibraries.each { args it }
                 args "--no-save"

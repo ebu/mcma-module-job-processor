@@ -15,6 +15,13 @@ provider "azurerm" {
   }
 }
 
+provider "azapi" {
+  tenant_id       = var.azure_tenant_id
+  subscription_id = var.azure_subscription_id
+  client_id       = var.AZURE_CLIENT_ID
+  client_secret   = var.AZURE_CLIENT_SECRET
+}
+
 provider "mcma" {
   alias = "azure"
 
@@ -99,7 +106,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=nodejs22"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v1.0.0"
 
   prefix = "${var.prefix}-sr"
 

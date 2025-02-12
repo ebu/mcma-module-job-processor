@@ -10,7 +10,7 @@ task npmPack(type: Exec) {
     dependsOn ":verifyNodeJS"
     dependsOn tsc
     dependsOn copyPackageJson
-    enabled file("package.json").exists()
+    enabled = file("package.json").exists()
     inputs.file "package.json"
     inputs.dir "build/staging"
     outputs.dir "build/dist"

@@ -89,7 +89,7 @@ task terraformOutput(type: Exec) {
     commandLine terraformExecutable
     args "output", "-json"
     doFirst {
-        standardOutput new FileOutputStream("${projectDir}/terraform.output.json")
+        standardOutput = new FileOutputStream("${projectDir}/terraform.output.json")
     }
 }
 
