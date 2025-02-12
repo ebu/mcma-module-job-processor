@@ -1,5 +1,5 @@
 import { Context } from "aws-lambda";
-import * as AWSXRay from "aws-xray-sdk-core";
+import { captureAWSv3Client } from "aws-xray-sdk-core";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
@@ -16,9 +16,9 @@ import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 
 import { buildWorker, WorkerContext } from "@local/worker";
 
-const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
-const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
-const secretsManagerClient = AWSXRay.captureAWSv3Client(new SecretsManagerClient({}));
+const cloudWatchLogsClient = captureAWSv3Client(new CloudWatchLogsClient({}));
+const dynamoDBClient = captureAWSv3Client(new DynamoDBClient({}));
+const secretsManagerClient = captureAWSv3Client(new SecretsManagerClient({}));
 
 const secretsProvider = new AwsSecretsManagerSecretsProvider({ client: secretsManagerClient });
 const authProvider = new AuthProvider().add(awsV4Auth()).add(mcmaApiKeyAuth({ secretsProvider }));

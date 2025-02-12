@@ -1,5 +1,5 @@
 import { Context, ScheduledEvent } from "aws-lambda";
-import * as AWSXRay from "aws-xray-sdk-core";
+import { captureAWSv3Client } from "aws-xray-sdk-core";
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { LambdaClient } from "@aws-sdk/client-lambda";
@@ -14,9 +14,9 @@ import { LambdaWorkerInvoker } from "@mcma/aws-lambda-worker-invoker";
 import { AwsDataController, buildDbTableProvider } from "@local/data-aws";
 import { JobChecker } from "@local/job-checker";
 
-const cloudWatchLogsClient = AWSXRay.captureAWSv3Client(new CloudWatchLogsClient({}));
-const dynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
-const lambdaClient = AWSXRay.captureAWSv3Client(new LambdaClient({}));
+const cloudWatchLogsClient = captureAWSv3Client(new CloudWatchLogsClient({}));
+const dynamoDBClient = captureAWSv3Client(new DynamoDBClient({}));
+const lambdaClient = captureAWSv3Client(new LambdaClient({}));
 
 const loggerProvider = new AwsCloudWatchLoggerProvider("job-processor-job-checker", getLogGroupName(), cloudWatchLogsClient);
 const workerInvoker = new LambdaWorkerInvoker(lambdaClient);
