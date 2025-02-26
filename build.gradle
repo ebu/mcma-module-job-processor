@@ -1,4 +1,4 @@
-def moduleVersion = "1.0.0"
+def moduleVersion = "1.0.1"
 
 def requiredVersionTerraform = "^1.10.0"
 def requiredVersionNodeJS = "^22.0.0"

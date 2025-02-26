@@ -21,13 +21,14 @@ locals {
 resource "aws_secretsmanager_secret_version" "api_key_security_config" {
   count = var.api_security_auth_type == "McmaApiKey" ? 1 : 0
 
-  secret_id     = aws_secretsmanager_secret.api_key_security_config[0].id
-  secret_string = jsonencode(merge({
-    "no-auth"    = {}
-    "valid-auth" = {
-      "^/jobs(?:/.+)?$" = ["GET"]
-    }
-  },
+  secret_id = aws_secretsmanager_secret.api_key_security_config[0].id
+  secret_string = jsonencode(merge(
+    {
+      "no-auth" = {}
+      "valid-auth" = {
+        "^/jobs(?:/.+)?$" = ["GET"]
+      }
+    },
     local.api_keys_read_only,
     local.api_keys_read_write
   ))

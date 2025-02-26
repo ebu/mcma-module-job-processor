@@ -3,20 +3,20 @@
 ##############################
 
 locals {
-  lambda_name_api_handler = format("%.64s", replace("${var.prefix}-api-handler", "/[^a-zA-Z0-9_]+/", "-" ))
+  lambda_name_api_handler = format("%.64s", replace("${var.prefix}-api-handler", "/[^a-zA-Z0-9_]+/", "-"))
 }
 
 resource "aws_iam_role" "api_handler" {
-  name = format("%.64s", replace("${var.prefix}-${var.aws_region}-api-handler", "/[^a-zA-Z0-9_]+/", "-" ))
+  name = format("%.64s", replace("${var.prefix}-${var.aws_region}-api-handler", "/[^a-zA-Z0-9_]+/", "-"))
   path = var.iam_role_path
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowLambdaAssumingRole"
-        Effect    = "Allow"
-        Action    = "sts:AssumeRole"
+        Sid    = "AllowLambdaAssumingRole"
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -34,73 +34,74 @@ resource "aws_iam_role_policy" "api_handler" {
   role = aws_iam_role.api_handler.id
 
   policy = jsonencode({
-    Version   = "2012-10-17"
-    Statement = concat([
-      {
-        Sid      = "DescribeCloudWatchLogs"
-        Effect   = "Allow"
-        Action   = "logs:DescribeLogGroups"
-        Resource = "*"
-      },
-      {
-        Sid    = "WriteToCloudWatchLogs"
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-        ]
-        Resource = concat([
-          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${var.log_group.name}:*",
-          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.lambda_name_api_handler}:*",
-        ], var.enhanced_monitoring_enabled ? [
-          "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda-insights:*",
-        ] : [])
-      },
-      {
-        Sid    = "ListAndDescribeDynamoDBTables"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:List*",
-          "dynamodb:DescribeReservedCapacity*",
-          "dynamodb:DescribeLimits",
-          "dynamodb:DescribeTimeToLive",
-        ],
-        Resource = "*"
-      },
-      {
-        Sid    = "AllowTableOperations"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:BatchGetItem",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:DescribeTable",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:UpdateItem",
-        ]
-        Resource = [
-          aws_dynamodb_table.service_table.arn,
-          "${aws_dynamodb_table.service_table.arn}/index/*",
-        ]
-      },
-      {
-        Sid      = "AllowInvokingWorkerLambda"
-        Effect   = "Allow"
-        Action   = "lambda:InvokeFunction"
-        Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.lambda_name_worker}"
-      },
+    Version = "2012-10-17"
+    Statement = concat(
+      [
+        {
+          Sid      = "DescribeCloudWatchLogs"
+          Effect   = "Allow"
+          Action   = "logs:DescribeLogGroups"
+          Resource = "*"
+        },
+        {
+          Sid    = "WriteToCloudWatchLogs"
+          Effect = "Allow"
+          Action = [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+          ]
+          Resource = concat([
+            "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:${var.log_group.name}:*",
+            "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.lambda_name_api_handler}:*",
+            ], var.enhanced_monitoring_enabled ? [
+            "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda-insights:*",
+          ] : [])
+        },
+        {
+          Sid    = "ListAndDescribeDynamoDBTables"
+          Effect = "Allow"
+          Action = [
+            "dynamodb:List*",
+            "dynamodb:DescribeReservedCapacity*",
+            "dynamodb:DescribeLimits",
+            "dynamodb:DescribeTimeToLive",
+          ],
+          Resource = "*"
+        },
+        {
+          Sid    = "AllowTableOperations"
+          Effect = "Allow"
+          Action = [
+            "dynamodb:BatchGetItem",
+            "dynamodb:BatchWriteItem",
+            "dynamodb:DeleteItem",
+            "dynamodb:DescribeTable",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:UpdateItem",
+          ]
+          Resource = [
+            aws_dynamodb_table.service_table.arn,
+            "${aws_dynamodb_table.service_table.arn}/index/*",
+          ]
+        },
+        {
+          Sid      = "AllowInvokingWorkerLambda"
+          Effect   = "Allow"
+          Action   = "lambda:InvokeFunction"
+          Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.lambda_name_worker}"
+        },
 
-      {
-        Sid      = "AllowReadingApiKey"
-        Effect   = "Allow"
-        Action   = "secretsmanager:GetSecretValue"
-        Resource = aws_secretsmanager_secret.api_key.arn
-      },
-    ],
+        {
+          Sid      = "AllowReadingApiKey"
+          Effect   = "Allow"
+          Action   = "secretsmanager:GetSecretValue"
+          Resource = aws_secretsmanager_secret.api_key.arn
+        },
+      ],
       length(var.execute_api_arns) > 0 ?
       [
         {
@@ -133,7 +134,7 @@ resource "aws_iam_role_policy" "api_handler" {
           ],
           Resource = "*"
         }
-      ] : [])
+    ] : [])
   })
 }
 
