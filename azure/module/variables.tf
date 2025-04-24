@@ -84,6 +84,11 @@ variable "app_insights" {
   })
 }
 
+variable "virtual_network_subnet_id" {
+  type    = string
+  default = null
+}
+
 #######################
 # API authentication
 #######################

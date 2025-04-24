@@ -51,6 +51,52 @@ resource "azurerm_storage_account" "storage_account" {
   location                 = azurerm_resource_group.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+
+  allow_nested_items_to_be_public = false
+
+  sas_policy {
+    expiration_period = "0.01:00:00"
+  }
+
+  blob_properties {
+    delete_retention_policy {
+      days = "7"
+    }
+    container_delete_retention_policy {
+      days = "7"
+    }
+  }
+}
+
+######################
+# Virtual Network
+######################
+
+resource "azurerm_virtual_network" "virtual_network" {
+  name                = var.prefix
+  resource_group_name = azurerm_resource_group.resource_group.name
+  location            = azurerm_resource_group.resource_group.location
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "private" {
+  name                 = "private"
+  resource_group_name  = azurerm_resource_group.resource_group.name
+  virtual_network_name = azurerm_virtual_network.virtual_network.name
+  address_prefixes     = ["10.0.1.0/24"]
+
+  service_endpoints = ["Microsoft.AzureCosmosDB"]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name = "Microsoft.App/environments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
 
 ######################
@@ -74,6 +120,20 @@ resource "azurerm_cosmosdb_account" "cosmosdb_account" {
 
   capabilities {
     name = "EnableServerless"
+  }
+
+  ip_range_filter = [
+    "13.88.56.148",
+    "13.91.105.215",
+    "4.210.172.107",
+    "40.91.218.243"
+  ]
+
+  is_virtual_network_filter_enabled = true
+
+  virtual_network_rule {
+    id                                   = azurerm_subnet.private.id
+    ignore_missing_vnet_service_endpoint = false
   }
 }
 
@@ -106,7 +166,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v1.0.0"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=azure-vnet-integration"
 
   prefix = "${var.prefix}-sr"
 
@@ -125,6 +185,8 @@ module "service_registry_azure" {
   ]
 
   key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
+
+  virtual_network_subnet_id = azurerm_subnet.private.id
 }
 
 #########################
@@ -155,6 +217,8 @@ module "job_processor_azure" {
   ]
 
   key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
+
+  virtual_network_subnet_id = azurerm_subnet.private.id
 }
 
 resource "mcma_job_profile" "transcribe_azure" {
