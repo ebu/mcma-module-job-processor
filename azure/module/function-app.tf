@@ -60,9 +60,15 @@ resource "azapi_resource" "function_app" {
         }
         runtime = {
           name    = "node"
-          version = "20"
+          version = "22"
         }
         scaleAndConcurrency = {
+          alwaysReady = var.use_flex_consumption_plan_always_ready ? [
+            {
+              name          = "function:worker"
+              instanceCount = 1
+            }
+          ] : []
           instanceMemoryMB     = 2048
           maximumInstanceCount = 100
         }
