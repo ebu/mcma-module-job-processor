@@ -7,17 +7,17 @@
     "types": "index.d.ts",
     "license": "Apache-2.0",
     "dependencies": {
-        "uuid": "^11.0.3"
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
-        "@mcma/azure-cosmos-db": "1.0.0",
-        "@mcma/core": "1.0.0",
-        "@mcma/data": "1.0.0",
-        "@types/node": "^22.10.2"
+        "@mcma/azure-cosmos-db": "1.1.2",
+        "@mcma/core": "1.1.2",
+        "@mcma/data": "1.1.2",
+        "@types/node": "^22.19.7"
     },
     "peerDependencies": {
-        "@mcma/azure-cosmos-db": "1.0.0",
-        "@mcma/core": "1.0.0",
-        "@mcma/data": "1.0.0"
+        "@mcma/azure-cosmos-db": "1.1.2",
+        "@mcma/core": "1.1.2",
+        "@mcma/data": "1.1.2"
     }
 }

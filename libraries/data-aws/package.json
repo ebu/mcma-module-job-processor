@@ -6,20 +6,20 @@
     "types": "index.d.ts",
     "license": "Apache-2.0",
     "dependencies": {
-        "@aws-sdk/client-cloudwatch-events": "^3.714.0",
-        "@aws-sdk/client-dynamodb": "^3.714.0",
-        "@aws-sdk/lib-dynamodb": "^3.714.0",
-        "uuid": "^11.0.3"
+        "@aws-sdk/client-cloudwatch-events": "^3.972.0",
+        "@aws-sdk/client-dynamodb": "^3.972.0",
+        "@aws-sdk/lib-dynamodb": "^3.972.0",
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
-        "@mcma/aws-dynamodb": "1.0.0",
-        "@mcma/core": "1.0.0",
-        "@mcma/data": "1.0.0",
-        "@types/node": "^22.10.2"
+        "@mcma/aws-dynamodb": "1.1.2",
+        "@mcma/core": "1.1.2",
+        "@mcma/data": "1.1.2",
+        "@types/node": "^22.19.7"
     },
     "peerDependencies": {
-        "@mcma/aws-dynamodb": "1.0.0",
-        "@mcma/core": "1.0.0",
-        "@mcma/data": "1.0.0"
+        "@mcma/aws-dynamodb": "1.1.2",
+        "@mcma/core": "1.1.2",
+        "@mcma/data": "1.1.2"
     }
 }
