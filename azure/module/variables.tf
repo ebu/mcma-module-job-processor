@@ -90,9 +90,33 @@ variable "app_insights" {
   })
 }
 
-variable "virtual_network_subnet_id" {
+variable "function_app_virtual_network_subnet_id" {
   type    = string
   default = null
+}
+
+variable "key_vault_enable_network_acls" {
+  type        = bool
+  default     = false
+  description = "Enable if you want to set network acls for key vault"
+}
+
+variable "key_vault_network_bypass" {
+  type        = string
+  default     = "None"
+  description = "Allow network bypass. Valid options are 'None' or 'AzureServices'"
+}
+
+variable "key_vault_network_ip_rules" {
+  type        = list(string)
+  default     = []
+  description = "IP ranges from which incoming traffic is allowed"
+}
+
+variable "key_vault_virtual_network_subnet_ids" {
+  type        = list(string)
+  default     = []
+  description = "Virtual private networks from which incoming traffic is allowed"
 }
 
 #######################

@@ -10,11 +10,12 @@ resource "azurerm_key_vault" "service" {
   purge_protection_enabled   = false
 
   dynamic "network_acls" {
-    for_each = var.use_flex_consumption_plan ? [] : [1]
+    for_each = var.key_vault_enable_network_acls ? [0] : []
     content {
-      bypass         = "AzureServices"
-      default_action = "Deny"
-      ip_rules       = ["0.0.0.0/0"]
+      bypass                     = var.key_vault_network_bypass
+      default_action             = "Deny"
+      ip_rules                   = var.key_vault_network_ip_rules
+      virtual_network_subnet_ids = var.key_vault_virtual_network_subnet_ids
     }
   }
 

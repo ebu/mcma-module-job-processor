@@ -85,7 +85,7 @@ resource "azurerm_subnet" "private" {
   virtual_network_name = azurerm_virtual_network.virtual_network.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  service_endpoints = ["Microsoft.AzureCosmosDB"]
+  service_endpoints = ["Microsoft.AzureCosmosDB", "Microsoft.KeyVault"]
 
   delegation {
     name = "delegation"
@@ -166,7 +166,7 @@ resource "azurerm_application_insights" "app_insights" {
 #########################
 
 module "service_registry_azure" {
-  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v1.3.1"
+  source = "github.com/ebu/mcma-module-service-registry//azure/module?ref=v1.4.0"
 
   prefix = "${var.prefix}-sr"
 
@@ -185,8 +185,11 @@ module "service_registry_azure" {
   ]
 
   key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
+  key_vault_enable_network_acls        = true
+  key_vault_network_ip_rules           = ["0.0.0.0/0"]
+  key_vault_virtual_network_subnet_ids = [azurerm_subnet.private.id]
 
-  virtual_network_subnet_id = azurerm_subnet.private.id
+  function_app_virtual_network_subnet_id = azurerm_subnet.private.id
 }
 
 #########################
@@ -217,8 +220,11 @@ module "job_processor_azure" {
   ]
 
   key_vault_secret_expiration_date = "2100-01-01T00:00:00Z"
+  key_vault_enable_network_acls        = true
+  key_vault_network_ip_rules           = ["0.0.0.0/0"]
+  key_vault_virtual_network_subnet_ids = [azurerm_subnet.private.id]
 
-  virtual_network_subnet_id = azurerm_subnet.private.id
+  function_app_virtual_network_subnet_id = azurerm_subnet.private.id
 }
 
 resource "mcma_job_profile" "transcribe_azure" {
