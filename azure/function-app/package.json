@@ -8,22 +8,22 @@
     "dependencies": {
         "@azure/keyvault-secrets": "^4.10.0",
         "@azure/identity": "^4.13.0",
-        "@mcma/api": "1.1.2",
-        "@mcma/azure-cosmos-db": "1.1.2",
-        "@mcma/azure-functions-api": "1.1.2",
-        "@mcma/azure-key-vault": "1.1.2",
-        "@mcma/azure-logger": "1.1.2",
-        "@mcma/azure-queue-worker-invoker": "1.1.2",
-        "@mcma/client": "1.1.2",
-        "@mcma/core": "1.1.2",
-        "@mcma/data": "1.1.2",
-        "@mcma/secrets": "1.1.2",
-        "@mcma/worker": "1.1.2",
-        "@mcma/worker-invoker": "1.1.2",
+        "@mcma/api": "1.1.4",
+        "@mcma/azure-cosmos-db": "1.1.4",
+        "@mcma/azure-functions-api": "1.1.4",
+        "@mcma/azure-key-vault": "1.1.4",
+        "@mcma/azure-logger": "1.1.4",
+        "@mcma/azure-queue-worker-invoker": "1.1.4",
+        "@mcma/client": "1.1.4",
+        "@mcma/core": "1.1.4",
+        "@mcma/data": "1.1.4",
+        "@mcma/secrets": "1.1.4",
+        "@mcma/worker": "1.1.4",
+        "@mcma/worker-invoker": "1.1.4",
         "uuid": "^11.1.0"
     },
     "devDependencies": {
-        "@azure/functions": "^4.11.0",
-        "@types/node": "^22.19.7"
+        "@azure/functions": "^4.11.2",
+        "@types/node": "^22.19.15"
     }
 }

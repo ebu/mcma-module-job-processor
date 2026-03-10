@@ -30,15 +30,31 @@ resource "aws_dynamodb_table" "service_table" {
 
   global_secondary_index {
     name            = "ResourceCreatedIndex"
-    hash_key        = "resource_pkey"
-    range_key       = "resource_created"
+
+    key_schema {
+      attribute_name = "resource_pkey"
+      key_type       = "HASH"
+    }
+    key_schema {
+      attribute_name = "resource_created"
+      key_type       = "RANGE"
+    }
+
     projection_type = "ALL"
   }
 
   global_secondary_index {
     name            = "ResourceStatusIndex"
-    hash_key        = "resource_status"
-    range_key       = "resource_created"
+
+    key_schema {
+      attribute_name = "resource_status"
+      key_type       = "HASH"
+    }
+    key_schema {
+      attribute_name = "resource_created"
+      key_type       = "RANGE"
+    }
+
     projection_type = "ALL"
   }
 
