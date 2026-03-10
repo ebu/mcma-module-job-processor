@@ -3,7 +3,7 @@
 
 provider "registry.terraform.io/azure/azapi" {
   version     = "2.8.0"
-  constraints = ">= 2.1.0"
+  constraints = ">= 2.8.0"
   hashes = [
     "h1:OHkG0B1rphuC9qxN4qXNshulMjM3gIqeJVPSvVcewcM=",
     "zh:048fa67ba123c6da65a7af12453328e36e1783cac1dbecc905d44ee7a1daa41c",
@@ -45,7 +45,7 @@ provider "registry.terraform.io/ebu/mcma" {
 
 provider "registry.terraform.io/hashicorp/aws" {
   version     = "6.35.1"
-  constraints = ">= 5.68.0"
+  constraints = ">= 6.35.1"
   hashes = [
     "h1:3AfkMHiID/TK41i9ipxdUbSx3v4hjIePNEZR0fEuQJ4=",
     "zh:0a16d1b0ba9379e5c5295e6b3caa42f0b8ba6b9f0a7cc9dbe58c232cf995db2d",
@@ -68,7 +68,7 @@ provider "registry.terraform.io/hashicorp/aws" {
 
 provider "registry.terraform.io/hashicorp/azurerm" {
   version     = "4.63.0"
-  constraints = ">= 4.12.0"
+  constraints = ">= 4.63.0"
   hashes = [
     "h1:jjqAsWVyu+nPkwmyk3vxNEF/6ZMfWs8cIxfkj1QGcxA=",
     "zh:08415ed33647642c59a73102a1443ef37b0e97d96c027d1364ad7c25b4d4dfbb",

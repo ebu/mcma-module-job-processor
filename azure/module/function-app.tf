@@ -218,7 +218,7 @@ resource "azurerm_windows_function_app" "function_app" {
     MCMA_API_KEY_SECURITY_CONFIG_HASH      = sha256(azurerm_key_vault_secret.api_key_security_config.value)
 
     WORKER_QUEUE_NAME       = azurerm_storage_queue.queue.name
-    MCMA_WORKER_FUNCTION_ID = azurerm_storage_queue.queue.id
+    MCMA_WORKER_FUNCTION_ID = azurerm_storage_queue.queue.url
 
     DEFAULT_JOB_TIMEOUT_IN_MINUTES = var.default_job_timeout_in_minutes
     JOB_RETENTION_PERIOD_IN_DAYS   = var.job_retention_period_in_days

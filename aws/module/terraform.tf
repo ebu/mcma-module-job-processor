@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.68.0"
+      version = ">= 6.35.1"
     }
     mcma = {
       source  = "ebu/mcma"
