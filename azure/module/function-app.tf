@@ -143,7 +143,7 @@ resource "azapi_resource" "function_app" {
           },
           {
             name  = "MCMA_WORKER_FUNCTION_ID",
-            value = azurerm_storage_queue.queue.id
+            value = azurerm_storage_queue.queue.url
           },
           {
             name  = "DEFAULT_JOB_TIMEOUT_IN_MINUTES",
