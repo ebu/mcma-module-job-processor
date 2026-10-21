@@ -1,5 +1,6 @@
 import { APIGatewayProxyEventV2, Context } from "aws-lambda";
-import { captureAWSv3Client } from "aws-xray-sdk-core";
+import AWSXRay from "aws-xray-sdk-core";
+const { captureAWSv3Client } = AWSXRay;
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";

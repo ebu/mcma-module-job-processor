@@ -8,6 +8,7 @@ resource "azurerm_key_vault" "service" {
   sku_name                   = "standard"
   soft_delete_retention_days = 7
   purge_protection_enabled   = false
+  rbac_authorization_enabled = false
 
   dynamic "network_acls" {
     for_each = var.key_vault_enable_network_acls ? [0] : []

@@ -1,0 +1,64 @@
+name: Prepare release
+on:
+  workflow_dispatch:
+    inputs:
+      create_draft:
+        description: Create a draft release after verification (false performs a dry run)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Require main
+        run: test "$GITHUB_REF" = refs/heads/main
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - id: version
+        name: Read release version
+        shell: bash
+        run: |
+          version=$(tr -d '\r\n' < release-version.txt)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Preparing Job Processor $version from $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+  verify:
+    name: Verify release ${{ needs.gate.outputs.version }}
+    needs: gate
+    uses: ./.github/workflows/verify.yml
+  draft:
+    name: Draft release ${{ needs.gate.outputs.version }}
+    needs: [gate, verify]
+    if: inputs.create_draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: terraform-modules
+          path: release
+      - name: Verify and create draft without rebuilding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.gate.outputs.version }}
+        shell: bash
+        run: |
+          cd release
+          sha256sum --check SHA256SUMS
+          jq -e --arg v "$VERSION" --arg sha "$GITHUB_SHA" '.version == $v and .revision == $sha' release.json
+          # Refuse existing tags/releases: never replace a published version.
+          count=$(gh api "repos/$GH_REPO/git/matching-refs/tags/v$VERSION" --jq 'length')
+          test "$count" = 0
+          printf 'Terraform modules and deployment bundles built from commit %s.\n\nAWS: Node.js 26 (preview); Azure: Node.js 24.\n' "$GITHUB_SHA" > notes.md
+          gh release create "v$VERSION" terraform-aws.zip terraform-azure.zip SHA256SUMS release.json \
+            --target "$GITHUB_SHA" --draft --title "Job Processor $VERSION" --notes-file notes.md

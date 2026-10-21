@@ -1,8 +1,8 @@
 import { Job, JobStatus, McmaException } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
-import { logJobEvent } from "../utils";
-import { WorkerContext } from "../worker-context";
+import { logJobEvent } from "../utils/index.js";
+import { WorkerContext } from "../worker-context.js";
 
 export async function failJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const { jobId, error } = workerRequest.input;

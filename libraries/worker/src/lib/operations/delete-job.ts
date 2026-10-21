@@ -1,7 +1,7 @@
 import { McmaException } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
-import { WorkerContext } from "../worker-context";
+import { WorkerContext } from "../worker-context.js";
 
 export async function deleteJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const jobId = workerRequest.input.jobId;

@@ -1,5 +1,6 @@
 import { Context, ScheduledEvent } from "aws-lambda";
-import { captureAWSv3Client } from "aws-xray-sdk-core";
+import AWSXRay from "aws-xray-sdk-core";
+const { captureAWSv3Client } = AWSXRay;
 import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { LambdaClient } from "@aws-sdk/client-lambda";

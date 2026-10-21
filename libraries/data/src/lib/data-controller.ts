@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Job, JobExecution, Logger } from "@mcma/core";
 import { DocumentDatabaseMutex, DocumentDatabaseTable, DocumentDatabaseTableProvider, QueryResults, QuerySortOrder } from "@mcma/data";
-import { JobResourceQueryParameters } from "./job-resource-query-parameters";
+import { JobResourceQueryParameters } from "./job-resource-query-parameters.js";
 
 export abstract class DataController {
     protected dbTable: DocumentDatabaseTable;

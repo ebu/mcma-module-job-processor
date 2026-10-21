@@ -2,7 +2,7 @@ import { LoggerProvider } from "@mcma/core";
 import { AuthProvider, ResourceManagerProvider } from "@mcma/client";
 import { ProviderCollection, Worker } from "@mcma/worker";
 
-import { cancelJob, deleteJob, failJob, processNotification, restartJob, startJob } from "./operations";
+import { cancelJob, deleteJob, failJob, processNotification, restartJob, startJob } from "./operations/index.js";
 
 export function buildWorker(authProvider: AuthProvider, loggerProvider: LoggerProvider, resourceManagerProvider: ResourceManagerProvider) {
     const providerCollection = new ProviderCollection({

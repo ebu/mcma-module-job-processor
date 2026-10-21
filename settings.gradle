@@ -5,7 +5,6 @@ include "aws",
         "aws:worker",
         "azure",
         "azure:function-app",
-        "deployment",
         "libraries:api",
         "libraries:data",
         "libraries:data-aws",
@@ -13,3 +12,7 @@ include "aws",
         "libraries:job-checker",
         "libraries:job-cleanup",
         "libraries:worker"
+
+if (!providers.gradleProperty("releaseBuild").isPresent()) {
+    include "deployment"
+}

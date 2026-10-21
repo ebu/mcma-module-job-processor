@@ -7,7 +7,7 @@ import { getWorkerFunctionId, WorkerInvoker } from "@mcma/worker-invoker";
 
 import { DataController } from "@local/data";
 
-import { buildQueryParameters } from "./queries";
+import { buildQueryParameters } from "./queries.js";
 
 export class JobRoutes extends McmaApiRouteCollection {
     constructor(private dataController: DataController, private resourceManagerProvider: ResourceManagerProvider, private workerInvoker: WorkerInvoker) {

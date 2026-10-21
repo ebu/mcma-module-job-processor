@@ -2,8 +2,8 @@ import { Job, JobAssignment, JobExecution, JobParameterBag, JobProfile, JobStatu
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 import { AuthProvider, ResourceManager, ServiceClient } from "@mcma/client";
 
-import { logJobEvent } from "../utils";
-import { WorkerContext } from "../worker-context";
+import { logJobEvent } from "../utils/index.js";
+import { WorkerContext } from "../worker-context.js";
 
 export async function startJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const jobId = workerRequest.input.jobId;
