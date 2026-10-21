@@ -25,8 +25,7 @@ resource "azurerm_storage_blob" "function_app" {
   count = var.use_flex_consumption_plan ? 1 : 0
 
   name                   = "released-package.zip"
-  storage_account_name   = var.storage_account.name
-  storage_container_name = azurerm_storage_container.function_app[0].name
+  storage_container_id   = azurerm_storage_container.function_app[0].id
   type                   = "Block"
   source                 = local_sensitive_file.function_app.filename
 }
@@ -60,7 +59,7 @@ resource "azapi_resource" "function_app" {
         }
         runtime = {
           name    = "node"
-          version = "22"
+          version = "24"
         }
         scaleAndConcurrency = {
           alwaysReady = var.use_flex_consumption_plan_always_ready ? [
@@ -184,7 +183,7 @@ resource "azurerm_windows_function_app" "function_app" {
 
   site_config {
     application_stack {
-      node_version = "~20"
+      node_version = "~24"
     }
 
     elastic_instance_minimum               = var.function_elastic_instance_minimum

@@ -4,14 +4,14 @@ import { getPublicUrl } from "@mcma/api";
 import { McmaTracker } from "@mcma/core";
 import { getTableName } from "@mcma/data";
 import { CosmosDbTableProvider, fillOptionsFromConfigVariables } from "@mcma/azure-cosmos-db";
-import { AppInsightsLoggerProvider } from "@mcma/azure-logger";
+import { AzureFunctionsLoggerProvider } from "@mcma/azure-logger";
 import { QueueWorkerInvoker } from "@mcma/azure-queue-worker-invoker";
 
 import { AzureDataController } from "@local/data-azure";
 import { JobChecker } from "@local/job-checker";
 import { InvocationContext, Timer } from "@azure/functions";
 
-const loggerProvider = new AppInsightsLoggerProvider("job-processor-job-checker");
+const loggerProvider = new AzureFunctionsLoggerProvider("job-processor-job-checker");
 const dbTableProvider = new CosmosDbTableProvider(fillOptionsFromConfigVariables());
 
 const workerInvoker = new QueueWorkerInvoker();
@@ -19,30 +19,31 @@ const workerInvoker = new QueueWorkerInvoker();
 const dataController = new AzureDataController(getTableName(), getPublicUrl(), dbTableProvider);
 
 export async function jobChecker(timer: Timer, context: InvocationContext) {
-    const tracker = new McmaTracker({
-        id: uuidv4(),
-        label: "Job Checker - " + new Date().toUTCString()
+    return loggerProvider.runWithContext(context, async () => {
+        const tracker = new McmaTracker({
+            id: uuidv4(),
+            label: "Job Checker - " + new Date().toUTCString()
+        });
+
+        const logger = await loggerProvider.get(context.invocationId, tracker);
+        try {
+            logger.functionStart(context.invocationId);
+            logger.debug(context);
+            logger.debug(timer);
+
+            const jobChecker = new JobChecker(
+                logger,
+                dataController,
+                workerInvoker,
+                context.invocationId,
+            );
+
+            await jobChecker.run();
+        } catch (error) {
+            logger.error(error);
+            throw error;
+        } finally {
+            logger.functionEnd(context.invocationId);
+        }
     });
-
-    const logger = await loggerProvider.get(context.invocationId, tracker);
-    try {
-        logger.functionStart(context.invocationId);
-        logger.debug(context);
-        logger.debug(timer);
-
-        const jobChecker = new JobChecker(
-            logger,
-            dataController,
-            workerInvoker,
-            context.invocationId,
-        );
-
-        await jobChecker.run();
-    } catch (error) {
-        logger.error(error);
-        throw error;
-    } finally {
-        logger.functionEnd(context.invocationId);
-        loggerProvider.flush();
-    }
 }

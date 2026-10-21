@@ -1,9 +1,9 @@
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { Job, McmaException } from "@mcma/core";
-import { startExecution } from "./start-job";
-import { cancelExecution } from "./cancel-job";
-import { WorkerContext } from "../worker-context";
+import { startExecution } from "./start-job.js";
+import { cancelExecution } from "./cancel-job.js";
+import { WorkerContext } from "../worker-context.js";
 
 export async function restartJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const jobId = workerRequest.input.jobId;

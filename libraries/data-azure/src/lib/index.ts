@@ -1,2 +1,2 @@
-export * from "./azure-data-controller";
-export * from "./queries";
+export * from "./azure-data-controller.js";
+export * from "./queries.js";

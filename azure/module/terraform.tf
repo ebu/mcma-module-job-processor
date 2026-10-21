@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.63.0"
+      version = ">= 5.10.0, < 6.0"
     }
     mcma = {
       source  = "ebu/mcma"
@@ -10,7 +10,7 @@ terraform {
     }
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 2.7.0"
+      version = ">= 2.13.0"
     }
   }
 }

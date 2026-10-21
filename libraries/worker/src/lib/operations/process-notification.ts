@@ -1,8 +1,8 @@
 import { Job, JobExecution, JobStatus, McmaException } from "@mcma/core";
 import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
-import { logJobEvent } from "../utils";
-import { WorkerContext } from "../worker-context";
+import { logJobEvent } from "../utils/index.js";
+import { WorkerContext } from "../worker-context.js";
 
 export async function processNotification(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const { jobId, jobExecutionId, notification } = workerRequest.input;

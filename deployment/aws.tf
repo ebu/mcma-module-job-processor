@@ -36,7 +36,7 @@ resource "aws_cloudwatch_log_group" "main" {
 #########################
 
 module "service_registry_aws" {
-  source = "github.com/ebu/mcma-module-service-registry//aws/module?ref=v1.4.1"
+  source = "https://github.com/ebu/mcma-module-service-registry/releases/download/v2.0.0/terraform-aws.zip"
 
   prefix = "${var.prefix}-service-registry"
 

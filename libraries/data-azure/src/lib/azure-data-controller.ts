@@ -3,7 +3,7 @@ import { DocumentDatabaseTableProvider, QueryResults } from "@mcma/data";
 
 import { DataController } from "@local/data";
 
-import { JobResourceQueryParameters, buildQuery } from "./queries";
+import { JobResourceQueryParameters, buildQuery } from "./queries.js";
 
 export class AzureDataController extends DataController {
 

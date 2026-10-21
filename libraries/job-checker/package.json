@@ -6,17 +6,21 @@
     "types": "index.d.ts",
     "license": "Apache-2.0",
     "dependencies": {
-        "uuid": "^11.1.0"
+        "uuid": "14.0.3"
     },
     "devDependencies": {
-        "@mcma/core": "1.1.4",
-        "@mcma/data": "1.1.4",
-        "@mcma/worker-invoker": "1.1.4",
-        "@types/node": "^22.19.15"
+        "@mcma/core": "2.0.0",
+        "@mcma/data": "2.0.0",
+        "@mcma/worker-invoker": "2.0.0",
+        "@types/node": "22.20.5"
     },
     "peerDependencies": {
-        "@mcma/core": "1.1.4",
-        "@mcma/data": "1.1.4",
-        "@mcma/worker-invoker": "1.1.4"
+        "@mcma/core": "2.0.0",
+        "@mcma/data": "2.0.0",
+        "@mcma/worker-invoker": "2.0.0"
+    },
+    "type": "module",
+    "engines": {
+        "node": ">=22.0.0"
     }
 }

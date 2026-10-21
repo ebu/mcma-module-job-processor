@@ -1,2 +1,2 @@
-export * from "./custom-queries";
-export * from "./aws-data-controller";
+export * from "./custom-queries.js";
+export * from "./aws-data-controller.js";

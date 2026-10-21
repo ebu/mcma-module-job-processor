@@ -6,7 +6,7 @@ import { DynamoDbTableOptions, DynamoDbTableProvider } from "@mcma/aws-dynamodb"
 
 import { DataController, JobResourceQueryParameters } from "@local/data";
 
-import { createJobResourceQuery } from "./custom-queries";
+import { createJobResourceQuery } from "./custom-queries.js";
 
 function getDynamoDbOptions(consistentRead: boolean): DynamoDbTableOptions {
     return {

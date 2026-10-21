@@ -2,7 +2,8 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "outDir": "build/staging",
-        "declaration": true
+        "declaration": true,
+        "rootDir": "src"
     },
     "include": [
         "src"

@@ -1,7 +1,7 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
-def McmaVersion = "1.1.4"
+def McmaVersion = "2.0.0"
 
 task setMcmaVersion {
     def packageJson = file("package.json")
@@ -46,13 +46,15 @@ interface InjectedExecOps {
 task npmInstall(type: Exec) {
     dependsOn ":verifyNodeJS"
     inputs.file("package.json")
-    outputs.file("package-lock.json")
+    inputs.file("package-lock.json")
     outputs.dir("node_modules")
     commandLine npmExecutable
-    args "install"
+    args "ci"
 
     def injected = project.objects.newInstance(InjectedExecOps)
     def projectDir = project.projectDir
+    def dependencyCheck = "${rootDir}/scripts/check-dependencies.cjs"
+    inputs.file(dependencyCheck)
     def localLibraries = []
     afterEvaluate {
         dependsOn.collect().each {
@@ -84,6 +86,9 @@ task npmInstall(type: Exec) {
                 localLibraries.each { args it }
                 args "--no-save"
             }
+        }
+        injected.execOps.exec {
+            commandLine nodeExecutable + [dependencyCheck, projectDir.toString()]
         }
     }
 }

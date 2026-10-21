@@ -1,9 +1,9 @@
 import { app } from "@azure/functions";
 
-import { apiHandler } from "./api-handler";
-import { workerQueueHandler } from "./worker";
-import { jobChecker } from "./job-checker";
-import { jobCleanup } from "./job-cleanup";
+import { apiHandler } from "./api-handler.js";
+import { workerQueueHandler } from "./worker.js";
+import { jobChecker } from "./job-checker.js";
+import { jobCleanup } from "./job-cleanup.js";
 
 app.http("api-handler", {
     route: "{*path}",

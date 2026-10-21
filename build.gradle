@@ -1,8 +1,8 @@
-def moduleVersion = "1.4.1"
+def moduleVersion = file("release-version.txt").text.trim()
 
-def requiredVersionTerraform = "^1.10.0"
-def requiredVersionNodeJS = "^22.0.0"
-def requiredVersionTsc = "^5.0.0"
+def requiredVersionTerraform = ">=1.10.0"
+def requiredVersionNodeJS = ">=22.0.0"
+def requiredVersionTsc = "7.0.2"
 
 allprojects {
     ext {
@@ -11,20 +11,29 @@ allprojects {
             ngExecutable = ["cmd", "/c", "ng"]
             npmExecutable = ["cmd", "/c", "npm"]
             terraformExecutable = ["cmd", "/c", "terraform"]
-            tscExecutable = ["cmd", "/c", "tsc"]
+            tscExecutable = ["node", "${rootDir}/node_modules/typescript/bin/tsc"]
             gitExecutable = ["git"]
         } else {
             nodeExecutable = ["node"]
             ngExecutable = ["ng"]
             npmExecutable = ["npm"]
             terraformExecutable = ["terraform"]
-            tscExecutable = ["tsc"]
+            tscExecutable = ["node", "${rootDir}/node_modules/typescript/bin/tsc"]
             gitExecutable = ["git"]
         }
     }
 }
 
 static def isSemVerMatching(String actual, String expected) {
+    if (expected.startsWith(">=")) {
+        def actualParts = actual.tokenize(".").collect { it as int }
+        def minimumParts = expected.substring(2).tokenize(".").collect { it as int }
+        for (int i = 0; i < 3; i++) {
+            if (actualParts[i] != minimumParts[i]) return actualParts[i] > minimumParts[i]
+        }
+        return true
+    }
+    if (!expected.startsWith("^") && !expected.startsWith("~")) return actual == expected
     def beginIndex
     def equalParts
 
@@ -95,11 +104,11 @@ task verifyNodeJS {
 }
 
 task verifyTerraform {
-    def actualVersion = getVersionTerraform()
 
     inputs.property("VERSION_TERRAFORM", requiredVersionTerraform)
-    outputs.upToDateWhen { isSemVerMatching(actualVersion, requiredVersionTerraform) }
+    outputs.upToDateWhen { false }
     doLast {
+        def actualVersion = getVersionTerraform()
         if (!isSemVerMatching(actualVersion, requiredVersionTerraform)) {
             throw new Exception("Required Terraform version " + requiredVersionTerraform + " not found. Detected version " + actualVersion)
         }
@@ -125,46 +134,12 @@ task build {
 
 task clean {}
 
-interface InjectedExecOps {
-    @Inject
-    ExecOperations getExecOps()
+// Release tags and assets are created together by the release workflow.
+task publish {
+    doLast { throw new GradleException("Use the Prepare release GitHub workflow, then review and publish its draft release.") }
 }
 
-task publish(type: Exec) {
-    def injected = project.objects.newInstance(InjectedExecOps)
-    def projectDir = project.projectDir
-
-    doFirst {
-        def stdout = new ByteArrayOutputStream()
-        def stderr = new ByteArrayOutputStream()
-
-
-        try {
-            injected.execOps.exec {
-                commandLine gitExecutable
-                workingDir projectDir
-                args "status", "--porcelain"
-                standardOutput = stdout
-                errorOutput = stderr
-            }
-        } catch (Exception ignored) {
-        }
-
-        if (stdout.toString().trim().length() > 0) {
-            throw new Exception("Local changes detected. Version tag not added")
-        }
-    }
-    commandLine gitExecutable
-    args "tag", "-a", "v${moduleVersion}", "-m", "Released version ${moduleVersion}"
-
-    doLast {
-        injected.execOps.exec {
-            commandLine gitExecutable
-            workingDir projectDir
-            args "push", "origin", "tag", "v${moduleVersion}"
-        }
-    }
-}
+apply from: "${rootDir}/gradle-tasks-for-release.gradle"
 
 afterEvaluate {
     // avoiding simultaneous connections to npmjs.com

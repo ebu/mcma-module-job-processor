@@ -1,0 +1,14 @@
+// TypeScript and application-local Gradle dependencies are built before bundling.
+task bundle(type: Exec) {
+    dependsOn tsc
+    inputs.dir "build/staging"
+    inputs.dir "node_modules"
+    inputs.file "package.json"
+    inputs.file "${rootDir}/package-lock.json"
+    inputs.file "${rootDir}/scripts/bundle.cjs"
+    inputs.file "${rootDir}/scripts/check-entrypoint.mjs"
+    if (bundlePlatform == "azure") inputs.file "host.json"
+    outputs.dir "build/bundle"
+    outputs.file "build/bundle-meta.json"
+    commandLine nodeExecutable + ["${rootDir}/scripts/bundle.cjs", projectDir.toString(), bundlePlatform]
+}

@@ -1,2 +1,2 @@
-export * from "./data-controller";
-export * from "./job-resource-query-parameters";
+export * from "./data-controller.js";
+export * from "./job-resource-query-parameters.js";

@@ -1,0 +1,57 @@
+import java.security.MessageDigest
+import groovy.json.JsonOutput
+
+def releaseVersion = file("release-version.txt").text.trim()
+if (!(releaseVersion ==~ /[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?/)) {
+    throw new GradleException("Invalid release-version.txt")
+}
+def releaseDirectory = layout.buildDirectory.dir("release")
+def deployments = [
+    aws: ["api-handler", "job-checker", "job-cleanup", "worker"].collect { name ->
+        [project: ":aws:${name}", zip: "lambda.zip", into: "lambdas", name: "${name}.zip"]
+    },
+    azure: [[project: ":azure:function-app", zip: "function.zip", into: "", name: "function-app.zip"]]
+]
+def archiveTasks = deployments.collect { cloud, applications ->
+    tasks.register("release${cloud.capitalize()}Archive", Zip) {
+        archiveFileName = "terraform-${cloud}.zip"
+        destinationDirectory = releaseDirectory
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+        // Include only module sources and the runtime dashboard template.
+        from("${cloud}/module") {
+            include "**/*.tf"
+            if (cloud == "aws") include "dashboard.json"
+        }
+        from("LICENSE")
+        applications.each { application ->
+            dependsOn "${application.project}:build"
+            // Always package newly built applications, never tracked deployment ZIPs.
+            from(project(application.project).layout.buildDirectory.file("dist/${application.zip}")) {
+                into application.into
+                rename { application.name }
+            }
+        }
+    }
+}
+
+tasks.register("prepareRelease") {
+    dependsOn archiveTasks
+    inputs.file("release-version.txt")
+    inputs.property("sourceRevision", providers.gradleProperty("sourceRevision").orElse("local"))
+    inputs.files(archiveTasks.collect { it.flatMap { task -> task.archiveFile } })
+    outputs.files(releaseDirectory.map { it.file("SHA256SUMS") }, releaseDirectory.map { it.file("release.json") })
+    doLast {
+        def files = archiveTasks.collect { it.get().archiveFile.get().asFile }.sort { it.name }
+        def hashes = files.collectEntries { f -> [(f.name): MessageDigest.getInstance("SHA-256").digest(f.bytes).encodeHex().toString()] }
+        def directory = releaseDirectory.get().asFile
+        new File(directory, "SHA256SUMS").text = hashes.collect { name, hash -> "${hash}  ${name}\n" }.join("")
+        new File(directory, "release.json").text = JsonOutput.prettyPrint(JsonOutput.toJson([
+            version: releaseVersion,
+            revision: inputs.properties.sourceRevision,
+            runtimes: [aws: "nodejs26.x", azure: "24"],
+            sha256: hashes
+        ])) + "\n"
+    }
+}

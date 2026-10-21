@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
-        "moduleResolution": "node",
+        "module": "Node20",
         "target": "ES2022",
         "esModuleInterop": true,
-        "downlevelIteration": true,
         "noImplicitAny": true,
-        "noImplicitReturns": true
+        "noImplicitReturns": true,
+        "types": [
+            "node"
+        ],
+        "strict": false
     }
 }

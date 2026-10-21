@@ -4,8 +4,8 @@ import { ProviderCollection, WorkerRequest } from "@mcma/worker";
 
 import { DataController } from "@local/data";
 
-import { logJobEvent } from "../utils";
-import { WorkerContext } from "../worker-context";
+import { logJobEvent } from "../utils/index.js";
+import { WorkerContext } from "../worker-context.js";
 
 export async function cancelJob(providers: ProviderCollection, workerRequest: WorkerRequest, context: WorkerContext) {
     const jobId = workerRequest.input.jobId;

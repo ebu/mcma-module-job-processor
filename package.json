@@ -1,0 +1,14 @@
+{
+    "name": "mcma-module-job-processor",
+    "private": true,
+    "engines": {
+        "node": ">=22.0.0"
+    },
+    "scripts": {
+        "verify": "node scripts/verify.cjs"
+    },
+    "devDependencies": {
+        "typescript": "7.0.2",
+        "esbuild": "0.28.2"
+    }
+}

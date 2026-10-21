@@ -3,7 +3,7 @@ import { QuerySortOrder } from "@mcma/data";
 import { getWorkerFunctionId, WorkerInvoker } from "@mcma/worker-invoker";
 
 import { DataController } from "@local/data";
-import { buildQueryParameters } from "./queries";
+import { buildQueryParameters } from "./queries.js";
 
 export class JobExecutionRoutes extends McmaApiRouteCollection {
     constructor(private dataController: DataController, private workerInvoker: WorkerInvoker) {
