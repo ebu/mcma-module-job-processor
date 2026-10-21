@@ -98,3 +98,16 @@ source = "https://github.com/ebu/mcma-module-job-processor/releases/download/v2.
 
 Draft release assets are not publicly downloadable. Publish the reviewed draft
 before updating downstream consumers to these URLs.
+
+### Terraform provider lockfile maintenance
+
+After changing provider versions, record checksums for both the local Windows
+platform and Linux CI before committing the lockfile:
+
+```powershell
+terraform -chdir=deployment providers lock -platform=windows_amd64 -platform=linux_amd64
+```
+
+CI uses `terraform init -lockfile=readonly` to verify the committed selections.
+A lockfile generated only on Windows may lack the Linux package-content hashes
+needed by subsequent validation, even when provider downloads pass ZIP checksums.
